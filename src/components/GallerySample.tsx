@@ -23,7 +23,18 @@ function formatMomentType(t: string) {
   return t.replace(/_/g, " ");
 }
 
-export function GallerySample({ sample }: { sample: SampleMeta }) {
+const TONES = ["hype", "flame", "cyber", "violet"] as const;
+
+export function GallerySample({ sample, index = 0 }: { sample: SampleMeta; index?: number }) {
+  const tone = TONES[index % TONES.length];
+  const accent =
+    tone === "hype"
+      ? "from-hype-400/20 to-hype-600/5 border-hype-400/30"
+      : tone === "flame"
+      ? "from-flame-500/20 to-flame-600/5 border-flame-400/40"
+      : tone === "cyber"
+      ? "from-cyber-400/20 to-cyber-600/5 border-cyber-400/40"
+      : "from-vibe-500/20 to-vibe-700/5 border-vibe-400/40";
   const musicRef = useRef<HTMLAudioElement | null>(null);
   const sfxRefs = useRef<(HTMLAudioElement | null)[]>([]);
   const [mixing, setMixing] = useState(false);
@@ -64,21 +75,21 @@ export function GallerySample({ sample }: { sample: SampleMeta }) {
   };
 
   return (
-    <div className="vibe-card rounded-3xl p-6 md:p-8 relative overflow-hidden">
-      <div className="absolute -top-16 -right-16 w-48 h-48 bg-vibe-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className={`vibe-card rounded-3xl p-6 md:p-8 relative overflow-hidden bg-gradient-to-br ${accent} hover:-translate-y-1 transition duration-300`}>
+      <div className="absolute -top-16 -right-16 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="flex items-start justify-between gap-4 mb-4 relative">
         <div>
-          <div className="text-xs uppercase tracking-[0.25em] text-vibe-300 mb-2">
+          <div className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/60 mb-2">
             {formatMomentType(sample.moment_type)}
           </div>
-          <h2 className="font-display text-3xl md:text-5xl leading-[0.95] tracking-tight">
+          <h2 className="stamp font-display text-3xl md:text-5xl leading-[0.95] tracking-tight neon-hype">
             {sample.moment_tag}
           </h2>
         </div>
         <button
           onClick={mixing ? stopAll : playMix}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-vibe-500/20 hover:bg-vibe-500/30 border border-vibe-400/30 text-sm transition shrink-0"
+          className="btn-hype rounded-xl px-4 py-2.5 flex items-center gap-2 text-sm shrink-0 uppercase"
         >
           {mixing ? (
             <>

@@ -3,6 +3,7 @@
 import type { HypeResult as HypeResultData } from "@/lib/types";
 import { EnergyMeter } from "./VibeMeter";
 import { AudioStack } from "./AudioStack";
+import { Confetti } from "./Confetti";
 import { Share2, Users, Radio, Flame } from "lucide-react";
 
 function formatMomentType(t: string) {
@@ -30,15 +31,19 @@ export function HypeResult({ result }: { result: HypeResultData }) {
   return (
     <div className="animate-slide-up flex flex-col gap-6">
       <div className="vibe-card rounded-3xl p-8 md:p-10 relative overflow-hidden">
-        <div className="absolute -top-20 -right-20 w-60 h-60 bg-vibe-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-20 -right-20 w-60 h-60 bg-hype-400/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-28 -left-20 w-72 h-72 bg-flame-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 pointer-events-none">
+          <Confetti />
+        </div>
 
         <div className="flex items-start justify-between gap-4 mb-6 relative">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-vibe-300">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-hype-300 font-bold">
               <Flame className="w-3.5 h-3.5" />
               the moment
             </div>
-            <h2 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight">
+            <h2 className="stamp animate-stamp neon-hype font-display text-5xl md:text-8xl leading-[0.9] tracking-tight">
               {p.moment_tag}
             </h2>
             {p.one_liner && (
@@ -64,8 +69,9 @@ export function HypeResult({ result }: { result: HypeResultData }) {
           ))}
         </div>
 
-        <div className="mb-8 p-5 md:p-6 rounded-2xl bg-gradient-to-br from-vibe-500/15 to-pink-500/10 border border-vibe-400/20">
-          <div className="text-xs uppercase tracking-widest text-vibe-300 mb-2">
+        <div className="mb-8 p-5 md:p-6 rounded-2xl bg-gradient-to-br from-hype-400/15 to-flame-500/15 border border-hype-400/30 relative">
+          <div className="absolute -top-3 left-6 tape">your mantra</div>
+          <div className="text-xs uppercase tracking-widest text-hype-300 mb-2 opacity-0">
             your mantra
           </div>
           <div className="font-display text-2xl md:text-3xl leading-snug">
