@@ -61,9 +61,9 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="font-display text-2xl">Pre-Game</span>
+            <span className="font-display text-2xl">Hypeman</span>
             <span className="text-[10px] uppercase tracking-[0.3em] text-hype-300/70">
-              a soundtrack for right-before
+              your personal hypeman
             </span>
           </div>
         </div>
@@ -97,19 +97,19 @@ export default function Home() {
               </div>
 
               <h1 className="font-display text-6xl md:text-8xl leading-[0.88] tracking-tight">
-                The moment
+                Your personal
                 <br />
-                right before
+                <span className="gradient-hype italic animate-glitch-x">Hypeman.</span>
                 <br />
-                <span className="gradient-hype italic animate-glitch-x">deserves a soundtrack.</span>
+                <span className="text-white/85">For the leap.</span>
               </h1>
 
               <p className="text-lg md:text-2xl text-white/75 max-w-3xl leading-relaxed">
-                Tell us what you&apos;re about to do. We score it —
-                <span className="text-hype-200 font-semibold"> original music</span>,
-                <span className="text-flame-300 font-semibold"> punchy SFX</span>, and a
-                <span className="text-cyber-300 font-semibold"> live board</span> of who else
-                is here with you, right this second.
+                Tell him what you&apos;re about to do. He brings the
+                <span className="text-hype-200 font-semibold"> music</span>, the
+                <span className="text-flame-300 font-semibold"> punch</span>, and the
+                <span className="text-cyber-300 font-semibold"> proof you&apos;re not alone</span> —
+                exactly when you need to go do it.
               </p>
 
               <div className="flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.22em] text-white/55 font-bold">
@@ -260,7 +260,7 @@ function TurbopufferSection() {
             turbopuffer isn&apos;t a cache for us — it&apos;s the{" "}
             <span className="text-cyber-300 font-semibold">real-time semantic map of human anticipation</span>.
             Every moment someone types here becomes a vector, and the three queries
-            below are what make Pre-Game feel alive.
+            below are what make Hypeman feel alive.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

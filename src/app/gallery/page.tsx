@@ -49,7 +49,7 @@ export default async function GalleryPage() {
             className="sticker sticker-hype !py-1.5 !px-3 !text-[11px] w-fit"
           >
             <Flame className="w-3.5 h-3.5" />
-            back to Pre-Game
+            back to Hypeman
           </Link>
 
           <div className="flex items-center gap-3 mt-2">

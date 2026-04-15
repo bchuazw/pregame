@@ -14,11 +14,11 @@ export function HypeResult({ result }: { result: HypeResultData }) {
   const p = result.profile;
 
   const handleShare = async () => {
-    const shareText = `Right now I'm heading into "${p.moment_tag}". ${result.league_size.toLocaleString()} people have stood here before. Pre-Game scored my moment.`;
+    const shareText = `Right now I'm heading into "${p.moment_tag}". ${result.league_size.toLocaleString()} people have stood here before. Hypeman scored my moment.`;
     const url = typeof window !== "undefined" ? window.location.href : "";
     if (navigator.share) {
       try {
-        await navigator.share({ title: "Pre-Game", text: shareText, url });
+        await navigator.share({ title: "Hypeman", text: shareText, url });
       } catch {}
     } else {
       try {

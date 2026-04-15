@@ -2,20 +2,20 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Pre-Game — a soundtrack for the moment right before",
+  title: "Hypeman — your personal hypeman for the leap",
   description:
-    "Tell us what you're about to do. We score it with original music + SFX, and show you who else is right here with you. Powered by turbopuffer + ElevenLabs.",
+    "Tell Hypeman what you're about to do. He brings the music, the punch, and the proof you're not alone — exactly when you need to go do it.",
   openGraph: {
-    title: "Pre-Game",
+    title: "Hypeman",
     description:
-      "The moment right before deserves a soundtrack. Live hype line powered by AI.",
+      "Your personal hypeman for the leap right in front of you. AI-scored. Live.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Pre-Game",
+    title: "Hypeman",
     description:
-      "The moment right before deserves a soundtrack. Live hype line.",
+      "Your personal hypeman for the leap right in front of you.",
   },
 };
 

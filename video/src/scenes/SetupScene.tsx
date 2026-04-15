@@ -45,7 +45,7 @@ export const SetupScene: React.FC = () => {
       {/* Logo on dark plate */}
       <div
         style={{
-          padding: "20px 50px",
+          padding: "20px 60px",
           background: "rgba(8,7,13,0.82)",
           border: "4px solid rgba(252,211,77,0.7)",
           borderRadius: 28,
@@ -65,7 +65,7 @@ export const SetupScene: React.FC = () => {
               "0 0 60px rgba(252,211,77,0.9), 0 0 140px rgba(236,72,153,0.5)",
           }}
         >
-          Pre-Game
+          Hypeman
         </div>
       </div>
 
@@ -82,23 +82,23 @@ export const SetupScene: React.FC = () => {
           marginTop: 8,
         }}
       >
-        the moment right before
+        your personal hypeman
       </div>
 
       <div
         style={{
           fontFamily: "'Instrument Serif', Georgia, serif",
-          fontSize: 64,
+          fontSize: 60,
           color: "#fcd34d",
           fontStyle: "italic",
           lineHeight: 1.05,
-          maxWidth: 900,
+          maxWidth: 920,
           opacity: tagOp,
           marginTop: -6,
           textShadow: "0 4px 20px rgba(0,0,0,0.9), 0 0 30px rgba(252,211,77,0.4)",
         }}
       >
-        deserves a soundtrack.
+        for the leap right in front of you.
       </div>
 
       <div

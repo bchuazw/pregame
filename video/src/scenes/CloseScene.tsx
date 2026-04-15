@@ -41,7 +41,7 @@ export const CloseScene: React.FC = () => {
           maxWidth: 940,
         }}
       >
-        ★ next time you&apos;re about to ★
+        ★ meet your hypeman ★
       </div>
 
       <div
@@ -68,9 +68,9 @@ export const CloseScene: React.FC = () => {
             textAlign: "center",
           }}
         >
-          walk in
+          go
           <br />
-          ready.
+          do it.
         </div>
       </div>
 
