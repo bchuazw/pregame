@@ -1,40 +1,44 @@
 import OpenAI from "openai";
-import type { VibeProfile } from "./types";
+import type { MomentProfile } from "./types";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const SYSTEM_PROMPT = `You are VibeCheck, a witty cultural critic and sound-designer hybrid. Given any piece of text, you analyze its *true* underlying vibe — the energy, emotion, subtext, and secret feelings it betrays.
+const SYSTEM_PROMPT = `You are PRE-GAME, a hype coach for the moment right before a hard, scary, or meaningful thing.
 
-Be sharp. Be specific. Be a little mean when it's earned. Never generic. Never "this is a thoughtful piece." Find what's actually happening.
+Someone tells you what they're about to do. You pump them up. You read the specific emotional shape of their moment — is it a first date, a job interview, a goodbye, a confession, a creative performance, a physical challenge, a confrontation, a first day, a big ask? Each needs a different hype.
+
+Be specific. Be warm but fierce. Never generic affirmations. You see the exact thing they need to hear for THIS moment.
 
 You always respond with strict JSON matching this schema:
 {
-  "summary": string,             // A short, catchy title for the vibe. 2-5 words. Editorial and specific. Examples: "Weaponized Vulnerability", "Exhausted Optimism, Corporate Edition", "Divorced Dad Energy at a Wedding", "3am Philosopher Mode"
-  "subtext": string,             // One sentence (≤18 words) calling out what the content is secretly doing.
-  "tags": string[],              // 3-5 short lowercase tags, ≤3 words each. e.g. ["humble brag", "trying too hard", "corporate speak"]
-  "meters": {
-    "energy": number,            // 0-100
-    "tension": number,           // 0-100
-    "pretension": number,        // 0-100
-    "sincerity": number,         // 0-100
-    "chaos": number              // 0-100
+  "moment_type": string,           // Short snake_case category. Pick from or extend: job_interview, first_date, hard_conversation, quitting_job, creative_performance, physical_challenge, confrontation, first_day, big_ask, public_speaking, confession, goodbye, test_exam, pitch, meeting_parent, audition, competition, moving_away, new_habit, other. Use lowercase snake_case. Keep it tight.
+  "moment_tag": string,            // 1-4 WORD uppercase label for the display. Editorial, specific. Examples: "HARD CONVERSATION", "THE INTERVIEW", "FIRST DATE", "LAST SHIFT", "BIG ASK", "THE SPEECH", "MOVING DAY"
+  "mantra": string,                // ONE sentence the user should internalize. Second-person. 8-18 words. Specific to their exact moment, not generic. Punch, don't coddle.
+  "one_liner": string,             // A single evocative line (≤20 words) describing what they're really doing underneath. Not the surface thing. The real thing.
+  "tags": string[],                // 3-4 short lowercase descriptors, ≤2 words each.
+  "energy": {
+    "confidence": number,          // 0-100 — how much they need (not how much they have)
+    "intensity": number,
+    "focus": number,
+    "courage": number,
+    "joy": number
   },
-  "music_prompt": string,        // A vivid 1-2 sentence prompt for an AI music generator. Describe mood, instruments, tempo, and emotional arc that MUSICALLY INTERPRETS the content's true vibe (not its literal topic). 15-40 words.
-  "sfx_prompts": string[]        // EXACTLY 2 short prompts (8-14 words each) for an AI sound-effect generator. These should land like a punchline — editorial reactions, not ambient background. Examples: "Single awkward golf clap in an empty auditorium", "Distant elevator music suddenly cut off by a record scratch".
+  "music_prompt": string,          // 20-45 words. A vivid prompt for AI music generation. Describe mood, instruments, tempo (bpm), and emotional arc. The music should MATCH what they need to feel — triumphant if they need triumph, steady if they need steadiness, joyful if they need joy. Not all hype is loud.
+  "sfx_prompts": string[]          // EXACTLY 2 short prompts (8-14 words each) for AI sound-effect generation. These are punctuating, cinematic SFX that land like a hype moment: crowd roar, air horn, stadium drums, cathedral bells, rocket ignition, boxing bell, starting gun, triumphant brass stab. Match them to the specific moment.
 }
 
 Return only the JSON object. No preamble, no markdown fences.`;
 
-export async function analyzeVibe(content: string): Promise<VibeProfile> {
+export async function analyzeMoment(content: string): Promise<MomentProfile> {
   const res = await client.chat.completions.create({
     model: "gpt-4o-mini",
     response_format: { type: "json_object" },
-    temperature: 0.9,
+    temperature: 0.85,
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
       {
         role: "user",
-        content: `Vibe-check this:\n\n"""\n${content.slice(0, 4000)}\n"""`,
+        content: `Someone's about to do this. Pump them up:\n\n"""\n${content.slice(0, 2000)}\n"""`,
       },
     ],
   });
@@ -42,18 +46,20 @@ export async function analyzeVibe(content: string): Promise<VibeProfile> {
   const raw = res.choices[0]?.message?.content ?? "{}";
   const parsed = JSON.parse(raw);
 
-  const profile: VibeProfile = {
-    summary: String(parsed.summary ?? "Unnamed Vibe").slice(0, 80),
-    subtext: String(parsed.subtext ?? "").slice(0, 200),
+  const profile: MomentProfile = {
+    moment_type: normalizeType(parsed.moment_type),
+    moment_tag: String(parsed.moment_tag ?? "YOUR MOMENT").toUpperCase().slice(0, 40),
+    mantra: String(parsed.mantra ?? "You are built for this.").slice(0, 200),
+    one_liner: String(parsed.one_liner ?? "").slice(0, 200),
     tags: Array.isArray(parsed.tags)
-      ? parsed.tags.slice(0, 5).map((t: unknown) => String(t).toLowerCase().slice(0, 30))
+      ? parsed.tags.slice(0, 4).map((t: unknown) => String(t).toLowerCase().slice(0, 24))
       : [],
-    meters: {
-      energy: clampInt(parsed?.meters?.energy),
-      tension: clampInt(parsed?.meters?.tension),
-      pretension: clampInt(parsed?.meters?.pretension),
-      sincerity: clampInt(parsed?.meters?.sincerity),
-      chaos: clampInt(parsed?.meters?.chaos),
+    energy: {
+      confidence: clampInt(parsed?.energy?.confidence, 75),
+      intensity: clampInt(parsed?.energy?.intensity, 75),
+      focus: clampInt(parsed?.energy?.focus, 75),
+      courage: clampInt(parsed?.energy?.courage, 75),
+      joy: clampInt(parsed?.energy?.joy, 60),
     },
     music_prompt: String(parsed.music_prompt ?? "").slice(0, 500),
     sfx_prompts: Array.isArray(parsed.sfx_prompts)
@@ -62,12 +68,15 @@ export async function analyzeVibe(content: string): Promise<VibeProfile> {
     content_preview: content.slice(0, 240),
   };
 
-  if (!profile.music_prompt) profile.music_prompt = "Cinematic score matching a mysterious and unresolved emotional state, 80bpm, ambient textures";
+  if (!profile.music_prompt) {
+    profile.music_prompt =
+      "Cinematic triumphant orchestral score, building strings and brass, 110bpm, the sound of stepping into a moment that matters";
+  }
   if (profile.sfx_prompts.length < 2) {
     profile.sfx_prompts = [
       ...profile.sfx_prompts,
-      "A single awkward cough in a silent room",
-      "Distant wind through an empty hallway",
+      "Stadium crowd erupting into a roar, sustained and enormous",
+      "Triple air horn blast followed by cheering",
     ].slice(0, 2);
   }
   return profile;
@@ -82,8 +91,13 @@ export async function embedText(text: string): Promise<number[]> {
   return res.data[0].embedding;
 }
 
-function clampInt(v: unknown): number {
+function clampInt(v: unknown, fallback = 50): number {
   const n = Number(v);
-  if (!Number.isFinite(n)) return 50;
+  if (!Number.isFinite(n)) return fallback;
   return Math.max(0, Math.min(100, Math.round(n)));
+}
+
+function normalizeType(v: unknown): string {
+  const s = String(v ?? "other").toLowerCase().trim();
+  return s.replace(/[^a-z0-9_]/g, "_").slice(0, 40) || "other";
 }

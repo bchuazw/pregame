@@ -1,32 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, Sparkles } from "lucide-react";
-
-const PLACEHOLDERS = [
-  "Paste a tweet, LinkedIn post, breakup text, corporate email, or any text that deserves a vibe check...",
-  "Your last Slack message to your manager...",
-  "That passive-aggressive group chat text...",
-  "A Craigslist listing that felt off...",
-  "Your company's mission statement...",
-];
+import { Flame, Zap } from "lucide-react";
 
 const EXAMPLES = [
-  {
-    label: "LinkedIn post",
-    text: "Grateful and humbled to announce I'm joining @Megacorp as Chief Visionary Officer. This isn't just a job — it's a calling. To the haters: thank you for the fuel. To my real ones: I see you. Day 1, Year 1. Let's build. 🚀",
-  },
-  {
-    label: "Breakup text",
-    text: "hey so I've been thinking and I don't think we want the same things anymore. you're amazing but I need to focus on me right now. hope we can still be friends, but if you need space I understand. you'll always have a piece of my heart.",
-  },
-  {
-    label: "Mission statement",
-    text: "We believe in a future where synergy meets purpose. Our platform empowers creators to unlock their truest selves, one intentional action at a time. Disrupt boldly. Love louder. Iterate always.",
-  },
+  { label: "Job interview", text: "I'm about to walk into an interview for the job I've wanted for three years. My hands won't stop shaking." },
+  { label: "Quitting", text: "I'm about to tell my boss I'm quitting. I've rehearsed it for weeks. I've never done this before." },
+  { label: "First date", text: "First date in 20 minutes with someone who's way out of my league. I don't know what to say." },
+  { label: "Hard conversation", text: "I'm about to tell my best friend something that might end our friendship. I'm outside their door." },
+  { label: "Big race", text: "Half marathon starts in 30 minutes. I trained for 6 months. I've never done anything this hard." },
+  { label: "Asking them out", text: "I'm finally texting them back to ask if they want to get dinner. I've typed and deleted this message 40 times." },
 ];
 
-export function VibeInput({
+export function MomentInput({
   onSubmit,
   loading,
 }: {
@@ -34,7 +20,6 @@ export function VibeInput({
   loading: boolean;
 }) {
   const [value, setValue] = useState("");
-  const [placeholder] = useState(() => PLACEHOLDERS[Math.floor(Math.random() * PLACEHOLDERS.length)]);
 
   const submit = () => {
     const trimmed = value.trim();
@@ -48,10 +33,10 @@ export function VibeInput({
         <textarea
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder={placeholder}
-          rows={5}
+          placeholder="I'm about to..."
+          rows={4}
           disabled={loading}
-          className="w-full bg-transparent text-white placeholder:text-white/30 text-base md:text-lg resize-none outline-none disabled:opacity-60"
+          className="w-full bg-transparent text-white placeholder:text-white/30 text-lg md:text-xl resize-none outline-none disabled:opacity-60"
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
               e.preventDefault();
@@ -68,7 +53,6 @@ export function VibeInput({
             <kbd className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10">
               Enter
             </kbd>
-            <span className="ml-1">to submit</span>
           </div>
           <button
             onClick={submit}
@@ -77,13 +61,13 @@ export function VibeInput({
           >
             {loading ? (
               <>
-                <Sparkles className="w-4 h-4 animate-spin" />
-                <span>Checking...</span>
+                <Zap className="w-4 h-4 animate-pulse" />
+                <span>Loading the hype...</span>
               </>
             ) : (
               <>
-                <span>Check the vibe</span>
-                <ArrowRight className="w-4 h-4" />
+                <Flame className="w-4 h-4" />
+                <span>Hype me up</span>
               </>
             )}
           </button>
@@ -91,7 +75,7 @@ export function VibeInput({
       </div>
 
       <div className="flex flex-wrap gap-2 items-center">
-        <span className="text-xs text-white/40 mr-1">try:</span>
+        <span className="text-xs text-white/40 mr-1">i&apos;m about to:</span>
         {EXAMPLES.map((ex) => (
           <button
             key={ex.label}

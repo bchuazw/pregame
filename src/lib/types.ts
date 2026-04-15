@@ -1,34 +1,43 @@
-export interface VibeProfile {
-  summary: string;
-  subtext: string;
+export interface MomentProfile {
+  moment_type: string;
+  moment_tag: string;
+  mantra: string;
+  one_liner: string;
   tags: string[];
-  meters: {
-    energy: number;
-    tension: number;
-    pretension: number;
-    sincerity: number;
-    chaos: number;
+  energy: {
+    confidence: number;
+    intensity: number;
+    focus: number;
+    courage: number;
+    joy: number;
   };
   music_prompt: string;
   sfx_prompts: string[];
   content_preview: string;
 }
 
-export interface VibeTwin {
-  id: string;
-  content_preview: string;
-  summary: string;
-  similarity: number;
-  tags: string[];
+export interface HypeBoardItem {
+  moment_type: string;
+  count: number;
 }
 
-export interface VibeCheckResult {
+export interface SoloTwin {
   id: string;
-  profile: VibeProfile;
+  content_preview: string;
+  moment_tag: string;
+  moment_type: string;
+  similarity: number;
+  minutes_ago: number;
+}
+
+export interface HypeResult {
+  id: string;
+  profile: MomentProfile;
   music_audio_base64: string;
   sfx_audio_base64: string[];
-  vibe_twin: VibeTwin | null;
-  library_size: number;
-  similar_count: number;
+  solo_twin: SoloTwin | null;
+  hype_board: HypeBoardItem[];
+  live_count: number;
+  league_size: number;
   created_at: string;
 }

@@ -1,27 +1,33 @@
-# Vibe Check
+# Pre-Game
 
-Paste anything. Hear its true vibe.
+The moment right before deserves a soundtrack.
 
-Drop a tweet, email, LinkedIn post, breakup text, or any piece of content. An AI reads the subtext and generates an original music score + sound effects that expose what it *actually* sounds like. Then turbopuffer finds your content's **Vibe Twin** in a growing library of previously-checked vibes.
+Tell us what you're about to do — job interview, quitting conversation, first date, big race, hard goodbye. We score your moment with original music + sound effects, hand you a mantra, and show you in real time who else is standing exactly where you are right now.
 
 Built for [ElevenHacks #4 — turbopuffer × ElevenLabs](https://hacks.elevenlabs.io/hackathons/3).
 
 ## How it works
 
-1. **You paste content.** Any text — a tweet, an email, a Slack message, a mission statement.
-2. **GPT-4o-mini reads the subtext** and returns a structured vibe profile (summary, meters, music prompt, SFX prompts).
-3. **ElevenLabs Music API** composes a unique score that *interprets* the vibe — not the topic.
-4. **ElevenLabs Sound Effects API** generates two editorial SFX that land like a punchline.
-5. **turbopuffer** stores your vibe profile as a vector, finds the closest match in the library, and reveals your Vibe Twin.
-6. The library grows with every check. The more people use it, the weirder and better the twins get.
+1. **You tell us what's about to happen.** "I'm about to walk into an interview for the job I've wanted for three years."
+2. **GPT-4o-mini reads your exact moment** — the kind of fear, the specific stakes, the energy you need (not the energy you have).
+3. **ElevenLabs Music API** composes a hype track tuned to that moment. Interview panic needs steady-ness. Race day needs triumph. First date needs joy.
+4. **ElevenLabs Sound Effects API** drops the punctuating moments — stadium roar, air horn, cathedral bell.
+5. **turbopuffer** embeds your moment, finds the closest other person who stood here, and shows the **Live Hype Board**: how many people are heading into interviews, hard conversations, quitting moments, right now.
+6. You walk in with the mantra, the soundtrack, and the knowledge that 47 other people are also about to quit their jobs.
+
+## Why this is different
+
+Every other entry in the hackathon is a **production tool** — for musicians, podcasters, creators. Pre-Game is **for the rest of us**, in the exact 30 seconds before the hard thing.
+
+The turbopuffer magic isn't caching. It's **live semantic clustering of real human anticipation** — a map of what the world is nervous about right now.
 
 ## Stack
 
 - **Frontend**: Next.js 15 (App Router), React 19 RC, Tailwind CSS
-- **Vibe analysis**: OpenAI `gpt-4o-mini` (structured JSON output)
+- **Analysis**: OpenAI `gpt-4o-mini` with structured JSON output
 - **Embeddings**: OpenAI `text-embedding-3-small` (512 dims)
-- **Vector DB**: [turbopuffer](https://turbopuffer.com/) (cosine distance)
-- **Audio generation**: [ElevenLabs Music API](https://elevenlabs.io) + [ElevenLabs Sound Effects API](https://elevenlabs.io)
+- **Vector DB**: [turbopuffer](https://turbopuffer.com/) — cosine distance, time-filtered queries for the live board
+- **Audio**: [ElevenLabs Music API](https://elevenlabs.io) + [ElevenLabs Sound Effects API](https://elevenlabs.io)
 
 ## Running locally
 
@@ -34,15 +40,6 @@ npm run dev
 
 Then open `http://localhost:3000`.
 
-## Deploying to Render
-
-This repo includes a `render.yaml` blueprint. From the Render dashboard:
-
-1. **New → Blueprint**
-2. Connect this repo.
-3. Set the three secret env vars (`OPENAI_API_KEY`, `ELEVENLABS_API_KEY`, `TURBOPUFFER_API_KEY`).
-4. Deploy.
-
 ## Environment variables
 
 | Name | Description |
@@ -50,14 +47,12 @@ This repo includes a `render.yaml` blueprint. From the Render dashboard:
 | `OPENAI_API_KEY` | OpenAI API key (for analysis + embeddings) |
 | `ELEVENLABS_API_KEY` | ElevenLabs API key (Music + SFX) |
 | `TURBOPUFFER_API_KEY` | turbopuffer API key |
-| `TURBOPUFFER_NAMESPACE` | Namespace name (default: `vibecheck-library`) |
+| `TURBOPUFFER_NAMESPACE` | Namespace name (default: `pregame-hype-v1`) |
 | `TURBOPUFFER_REGION` | turbopuffer region (default: `gcp-us-central1`) |
 
-## Why turbopuffer?
+## Deploying to Render
 
-turbopuffer isn't a cache here — it's the **discovery engine**. Every vibe-checked piece of content becomes a point in embedding space. When you submit a new one, turbopuffer finds the one thing in the library that shares your exact frequency.
-
-The magic: a corporate mission statement and a Craigslist ad can end up as Vibe Twins. That cross-content connection is only possible because everything lives together in semantic space — and that's what turbopuffer is built for.
+This repo includes `render.yaml`. From the Render dashboard → New → Blueprint → connect this repo → set the three secret env vars → deploy.
 
 ## License
 

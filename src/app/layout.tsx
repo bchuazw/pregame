@@ -2,19 +2,20 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Vibe Check — the audio roast of any content",
+  title: "Pre-Game — a soundtrack for the moment right before",
   description:
-    "Paste a tweet, email, or post. Get an original score + sound effects that expose its true vibe. Powered by turbopuffer + ElevenLabs.",
+    "Tell us what you're about to do. We score it with original music + SFX, and show you who else is right here with you. Powered by turbopuffer + ElevenLabs.",
   openGraph: {
-    title: "Vibe Check",
+    title: "Pre-Game",
     description:
-      "Paste anything. Hear its true vibe, scored and SFX'd by AI.",
+      "The moment right before deserves a soundtrack. Live hype line powered by AI.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Vibe Check",
-    description: "Paste anything. Hear its true vibe.",
+    title: "Pre-Game",
+    description:
+      "The moment right before deserves a soundtrack. Live hype line.",
   },
 };
 

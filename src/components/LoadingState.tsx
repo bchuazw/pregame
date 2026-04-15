@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 
 const STAGES = [
-  "Reading between the lines...",
-  "Identifying the subtext...",
-  "Searching the vibe library...",
-  "Composing original score...",
-  "Generating sound effects...",
-  "Mixing the final cut...",
+  "Reading the moment...",
+  "Matching your frequency...",
+  "Finding who else is here right now...",
+  "Composing your hype...",
+  "Loading the crowd...",
+  "Almost game time...",
 ];
 
 export function LoadingState() {
@@ -32,7 +32,7 @@ export function LoadingState() {
           {STAGES[idx]}
         </div>
         <div className="text-sm text-white/40">
-          This takes about 20 seconds. Worth it.
+          About 20 seconds. You got this.
         </div>
       </div>
       <div className="flex gap-1.5">

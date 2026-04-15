@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export function VibeMeter({
+export function EnergyMeter({
   label,
   value,
   delay = 0,
