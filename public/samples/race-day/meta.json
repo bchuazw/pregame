@@ -1,0 +1,32 @@
+{
+  "slug": "race-day",
+  "content": "It's marathon morning. I trained for 18 weeks. The gun goes off in an hour.",
+  "moment_tag": "MARATHON MORNING",
+  "moment_type": "physical_challenge",
+  "mantra": "You've put in the work; now unleash your relentless spirit on that course.",
+  "one_liner": "You're not just running; you're crossing the finish line of your dreams.",
+  "tags": [
+    "endurance",
+    "achievement",
+    "determination",
+    "focus"
+  ],
+  "energy": {
+    "confidence": 90,
+    "intensity": 100,
+    "focus": 95,
+    "courage": 85,
+    "joy": 100
+  },
+  "music_prompt": "An epic orchestral build with steady percussion, rising strings, and triumphant horns, gradually increasing tempo leading to a powerful climax.",
+  "sfx_prompts": [
+    "starting gun fire",
+    "crowd cheering loudly"
+  ],
+  "music_file": "samples/race-day/music.mp3",
+  "sfx_files": [
+    "samples/race-day/sfx-0.mp3",
+    "samples/race-day/sfx-1.mp3"
+  ],
+  "generated_at": "2026-04-15T05:19:19.323Z"
+}

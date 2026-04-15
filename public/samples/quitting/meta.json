@@ -1,0 +1,32 @@
+{
+  "slug": "quitting",
+  "content": "In five minutes I'm walking into my boss's office to tell him I quit.",
+  "moment_tag": "LAST SHIFT",
+  "moment_type": "quitting_job",
+  "mantra": "You are reclaiming your power and stepping into a brighter future.",
+  "one_liner": "You're not just quitting, you're breaking free to chase your dreams.",
+  "tags": [
+    "empowerment",
+    "change",
+    "freedom",
+    "courage"
+  ],
+  "energy": {
+    "confidence": 90,
+    "intensity": 85,
+    "focus": 80,
+    "courage": 95,
+    "joy": 70
+  },
+  "music_prompt": "A powerful, uplifting anthem with strong drums and soaring strings. Mid-tempo (120 bpm) that builds to a triumphant climax, evoking determination and freedom.",
+  "sfx_prompts": [
+    "crowd roar of support",
+    "boxing bell for the fight ahead"
+  ],
+  "music_file": "samples/quitting/music.mp3",
+  "sfx_files": [
+    "samples/quitting/sfx-0.mp3",
+    "samples/quitting/sfx-1.mp3"
+  ],
+  "generated_at": "2026-04-15T05:18:38.665Z"
+}

@@ -47,6 +47,13 @@ export default function Home() {
           <span className="font-display text-xl">Pre-Game</span>
         </div>
         <div className="flex items-center gap-4 text-xs text-white/40">
+          <a
+            href="/gallery"
+            className="uppercase tracking-widest text-vibe-300 hover:text-vibe-200 transition"
+          >
+            Gallery
+          </a>
+          <span className="text-white/20">·</span>
           <span className="hidden sm:inline">powered by</span>
           <span className="uppercase tracking-widest">turbopuffer</span>
           <span className="text-white/20">×</span>

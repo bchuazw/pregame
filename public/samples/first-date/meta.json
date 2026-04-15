@@ -1,0 +1,31 @@
+{
+  "slug": "first-date",
+  "content": "I'm sitting in my car outside the restaurant for my first date with her.",
+  "moment_tag": "FIRST DATE",
+  "moment_type": "first_date",
+  "mantra": "You’re not just meeting someone, you’re inviting connection and possibility.",
+  "one_liner": "You're stepping into a moment that could change everything.",
+  "tags": [
+    "nervous excitement",
+    "connection",
+    "new beginnings"
+  ],
+  "energy": {
+    "confidence": 75,
+    "intensity": 80,
+    "focus": 90,
+    "courage": 85,
+    "joy": 70
+  },
+  "music_prompt": "A smooth, romantic jazz tune with soft piano and gentle percussion, gradually building in anticipation and warmth.",
+  "sfx_prompts": [
+    "gentle heartbeat",
+    "soft chime"
+  ],
+  "music_file": "samples/first-date/music.mp3",
+  "sfx_files": [
+    "samples/first-date/sfx-0.mp3",
+    "samples/first-date/sfx-1.mp3"
+  ],
+  "generated_at": "2026-04-15T05:18:52.902Z"
+}

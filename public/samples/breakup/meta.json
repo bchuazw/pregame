@@ -1,0 +1,31 @@
+{
+  "slug": "breakup",
+  "content": "I'm about to tell my partner of four years that I can't do this anymore.",
+  "moment_tag": "FINAL BREAKUP",
+  "moment_type": "hard_conversation",
+  "mantra": "You are choosing your truth, and that is your strength.",
+  "one_liner": "You're not just ending a relationship; you're reclaiming your self-worth.",
+  "tags": [
+    "heartbreak",
+    "courage",
+    "truth"
+  ],
+  "energy": {
+    "confidence": 80,
+    "intensity": 90,
+    "focus": 85,
+    "courage": 95,
+    "joy": 20
+  },
+  "music_prompt": "A slow, steady piano melody builds up, layering in strings for emotional depth, rising in intensity to a heartfelt crescendo around 120 bpm, reflecting a journey towards self-liberation.",
+  "sfx_prompts": [
+    "soft wind chime",
+    "gentle heartbeat"
+  ],
+  "music_file": "samples/breakup/music.mp3",
+  "sfx_files": [
+    "samples/breakup/sfx-0.mp3",
+    "samples/breakup/sfx-1.mp3"
+  ],
+  "generated_at": "2026-04-15T05:19:06.013Z"
+}

@@ -1,0 +1,31 @@
+{
+  "slug": "interview",
+  "content": "I'm about to walk into an interview for the job I've wanted for three years.",
+  "moment_tag": "THE INTERVIEW",
+  "moment_type": "job_interview",
+  "mantra": "You’ve prepared for this; step in and claim what’s yours.",
+  "one_liner": "You’re not just interviewing; you’re stepping into your future.",
+  "tags": [
+    "career",
+    "opportunity",
+    "ambition"
+  ],
+  "energy": {
+    "confidence": 90,
+    "intensity": 85,
+    "focus": 95,
+    "courage": 90,
+    "joy": 80
+  },
+  "music_prompt": "Build a steady, driving rhythm with strings and light percussion, gradually increasing in intensity to create a triumphant feeling, like a path clearing for success.",
+  "sfx_prompts": [
+    "crowd roar",
+    "triumphant brass stab"
+  ],
+  "music_file": "samples/interview/music.mp3",
+  "sfx_files": [
+    "samples/interview/sfx-0.mp3",
+    "samples/interview/sfx-1.mp3"
+  ],
+  "generated_at": "2026-04-15T05:18:24.094Z"
+}

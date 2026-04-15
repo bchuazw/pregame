@@ -1,0 +1,31 @@
+{
+  "slug": "ask-them-out",
+  "content": "I'm about to walk up to her and finally ask her out after six months.",
+  "moment_tag": "THE ASK",
+  "moment_type": "first_date",
+  "mantra": "You’ve built this moment; now own it and shine!",
+  "one_liner": "You're stepping into a world of possibility and connection.",
+  "tags": [
+    "romantic",
+    "courageous",
+    "vulnerable"
+  ],
+  "energy": {
+    "confidence": 85,
+    "intensity": 90,
+    "focus": 95,
+    "courage": 100,
+    "joy": 75
+  },
+  "music_prompt": "Upbeat tempo at 130 bpm, featuring guitar riffs and light percussion, building to a joyous crescendo that matches your excitement and hope.",
+  "sfx_prompts": [
+    "gentle crowd cheer",
+    "sparkling magic chime"
+  ],
+  "music_file": "samples/ask-them-out/music.mp3",
+  "sfx_files": [
+    "samples/ask-them-out/sfx-0.mp3",
+    "samples/ask-them-out/sfx-1.mp3"
+  ],
+  "generated_at": "2026-04-15T05:19:34.668Z"
+}
