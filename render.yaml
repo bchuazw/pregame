@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: vibecheck
+    runtime: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ELEVENLABS_API_KEY
+        sync: false
+      - key: TURBOPUFFER_API_KEY
+        sync: false
+      - key: TURBOPUFFER_NAMESPACE
+        value: vibecheck-library
+      - key: TURBOPUFFER_REGION
+        value: gcp-us-central1
