@@ -1,7 +1,7 @@
 import { Config } from "@remotion/cli/config";
 
 Config.setVideoImageFormat("jpeg");
-Config.setConcurrency(2);
+Config.setConcurrency(6);
 Config.overrideWebpackConfig((config) => {
   return {
     ...config,

@@ -1,87 +1,86 @@
-import { AbsoluteFill, Sequence } from "remotion";
-import { TitleScene } from "../scenes/TitleScene";
+import { AbsoluteFill, Audio, Sequence, staticFile } from "remotion";
 import { HookScene } from "../scenes/HookScene";
+import { SetupScene } from "../scenes/SetupScene";
 import { DemoScene } from "../scenes/DemoScene";
 import { PufferScene } from "../scenes/PufferScene";
 import { CloseScene } from "../scenes/CloseScene";
 import { Background } from "../scenes/Background";
-import { FPS } from "../Root";
+const FPS = 60;
+const s = (n: number) => Math.round(n * FPS);
 
-const s = (n: number) => n * FPS;
+// 58s total:
+//   0-2.5    HOOK           (2.5s)
+//   2.5-5    SETUP          (2.5s)
+//   5-19     DEMO Interview (14s — music breathes)
+//   19-33    DEMO First Date (14s)
+//   33-47    Puffer         (14s)
+//   47-58    Close          (11s)
+//
+// Continuous background bed at low volume so it never goes silent.
+// During demo windows, bed ducks to ~0.04 so the demo music takes the spotlight.
+
+const DEMO_1 = { start: s(5), end: s(19) };
+const DEMO_2 = { start: s(19), end: s(33) };
+
+const bedVolume = (frame: number) => {
+  const inDemo1 = frame >= DEMO_1.start && frame < DEMO_1.end;
+  const inDemo2 = frame >= DEMO_2.start && frame < DEMO_2.end;
+  if (inDemo1 || inDemo2) return 0.05;
+  return 0.32;
+};
 
 export const PreGame: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: "#08070d", fontFamily: "system-ui" }}>
       <Background />
 
-      {/* 0-4s: Title */}
-      <Sequence from={0} durationInFrames={s(4)}>
-        <TitleScene />
-      </Sequence>
+      {/* Continuous bed under everything */}
+      <Audio src={staticFile("audio/bed.mp3")} volume={bedVolume} loop />
 
-      {/* 4-10s: Hook */}
-      <Sequence from={s(4)} durationInFrames={s(6)}>
+      <Sequence from={0} durationInFrames={s(2.5)}>
         <HookScene />
       </Sequence>
 
-      {/* 10-27s: Demo 1 — Interview (17s) */}
-      <Sequence from={s(10)} durationInFrames={s(17)}>
+      <Sequence from={s(2.5)} durationInFrames={s(2.5)}>
+        <SetupScene />
+      </Sequence>
+
+      <Sequence from={s(5)} durationInFrames={s(14)}>
         <DemoScene
-          prompt="I'm about to walk into an interview for the job I've wanted for three years."
+          prompt="walking into an interview for the job I've wanted for 3 years"
           momentTag="THE INTERVIEW"
           momentType="job interview"
-          mantra="You are ready; everything you are brings you to this moment."
+          mantra="You are ready. Everything you are brings you to this moment."
           tags={["panic", "stakes", "steady"]}
-          energy={{ confidence: 55, intensity: 85, focus: 75, courage: 80, joy: 40 }}
+          caption="hands shaking. brain won't stop."
           audioFile="audio/interview.mp3"
           sfxFile="audio/interview-sfx.mp3"
-          sfxStartFrame={s(6)}
           paletteFrom="#fcd34d"
           paletteTo="#f97316"
         />
       </Sequence>
 
-      {/* 27-42s: Demo 2 — Quitting (15s) */}
-      <Sequence from={s(27)} durationInFrames={s(15)}>
+      <Sequence from={s(19)} durationInFrames={s(14)}>
         <DemoScene
-          prompt="In five minutes I'm walking into my boss's office to tell him I quit."
-          momentTag="LAST SHIFT"
-          momentType="quitting"
-          mantra="You are not running away. You are running toward yourself."
-          tags={["resolve", "release", "owned"]}
-          energy={{ confidence: 80, intensity: 70, focus: 90, courage: 95, joy: 60 }}
-          audioFile="audio/quitting.mp3"
-          paletteFrom="#ec4899"
-          paletteTo="#db2777"
-        />
-      </Sequence>
-
-      {/* 42-55s: Demo 3 — First Date (13s) */}
-      <Sequence from={s(42)} durationInFrames={s(13)}>
-        <DemoScene
-          prompt="I'm sitting in my car outside the restaurant for my first date with her."
+          prompt="first date in 20 min with someone out of my league"
           momentTag="FIRST DATE"
           momentType="first date"
           mantra="Let them meet the real you — that's the only version worth showing up for."
           tags={["butterflies", "open", "playful"]}
-          energy={{ confidence: 60, intensity: 55, focus: 50, courage: 70, joy: 90 }}
+          caption="sitting in my car. can't get out."
           audioFile="audio/first-date.mp3"
           paletteFrom="#22d3ee"
           paletteTo="#a78bfa"
         />
       </Sequence>
 
-      {/* 55-75s: turbopuffer magic */}
-      <Sequence from={s(55)} durationInFrames={s(20)}>
+      <Sequence from={s(33)} durationInFrames={s(14)}>
         <PufferScene />
       </Sequence>
 
-      {/* 75-85s: Close */}
-      <Sequence from={s(75)} durationInFrames={s(10)}>
+      <Sequence from={s(47)} durationInFrames={s(11)}>
         <CloseScene />
       </Sequence>
     </AbsoluteFill>
   );
 };
-
-export { s };

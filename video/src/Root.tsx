@@ -1,8 +1,10 @@
 import { Composition } from "remotion";
 import { PreGame } from "./compositions/PreGame";
 
-export const FPS = 30;
-export const DURATION_SECONDS = 85;
+export const FPS = 60;
+export const DURATION_SECONDS = 58;
+export const WIDTH = 1080;
+export const HEIGHT = 1920;
 
 export const Root: React.FC = () => {
   return (
@@ -12,8 +14,8 @@ export const Root: React.FC = () => {
         component={PreGame}
         durationInFrames={DURATION_SECONDS * FPS}
         fps={FPS}
-        width={1920}
-        height={1080}
+        width={WIDTH}
+        height={HEIGHT}
       />
     </>
   );

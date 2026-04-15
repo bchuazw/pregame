@@ -6,19 +6,19 @@ import {
   spring,
   random,
 } from "remotion";
+import { CaptionBar } from "../components/CaptionBar";
 
-// 20-second scene. Shows the "live semantic map" of moments as dots
-// clustering by moment_type, with a counter ticking up and phase labels.
-
+// 14s @ 60fps = 840 frames. Live semantic map of moments.
+// Clusters placed inside 1080px safe area.
 const MOMENT_TYPES = [
-  { label: "interviews", color: "#fcd34d", count: 47, x: 0.3, y: 0.35 },
-  { label: "quitting", color: "#ec4899", count: 19, x: 0.7, y: 0.3 },
-  { label: "first dates", color: "#22d3ee", count: 62, x: 0.25, y: 0.68 },
-  { label: "hard talks", color: "#a78bfa", count: 31, x: 0.72, y: 0.72 },
-  { label: "races", color: "#f97316", count: 12, x: 0.52, y: 0.55 },
+  { label: "interviews", color: "#fcd34d", target: 47, cx: 300, cy: 680 },
+  { label: "quitting", color: "#ec4899", target: 19, cx: 770, cy: 720 },
+  { label: "first dates", color: "#22d3ee", target: 62, cx: 280, cy: 1140 },
+  { label: "hard talks", color: "#a78bfa", target: 31, cx: 790, cy: 1180 },
+  { label: "races", color: "#f97316", target: 12, cx: 540, cy: 920 },
 ];
 
-const NUM_DOTS = 140;
+const NUM_DOTS = 180;
 
 type Dot = {
   cluster: number;
@@ -30,194 +30,214 @@ type Dot = {
 const DOTS: Dot[] = Array.from({ length: NUM_DOTS }).map((_, i) => {
   const cluster = Math.floor(random(`cluster-${i}`) * MOMENT_TYPES.length);
   const angle = random(`ang-${i}`) * Math.PI * 2;
-  const dist = random(`dist-${i}`) * 130 + 10;
+  const dist = random(`dist-${i}`) * 160 + 20;
   return {
     cluster,
     rx: Math.cos(angle) * dist,
     ry: Math.sin(angle) * dist,
-    delay: Math.floor(random(`delay-${i}`) * 240),
+    delay: Math.floor(random(`delay-${i}`) * 360) + 40,
   };
 });
 
 export const PufferScene: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps, width, height } = useVideoConfig();
+  const { fps } = useVideoConfig();
 
-  const headerOpacity = interpolate(frame, [0, 20], [0, 1], {
+  const headerOp = interpolate(frame, [0, 20], [0, 1], {
     extrapolateRight: "clamp",
   });
 
-  // Explain labels time-phased
-  const labelPhase = Math.floor(frame / 100);
-
-  const captionIdx = Math.min(
-    2,
-    Math.floor(interpolate(frame, [0, 180, 360, 540], [0, 0, 1, 2], { extrapolateRight: "clamp" }))
-  );
+  // 4 caption phases
+  const captionPhase =
+    frame < 180 ? 0 : frame < 420 ? 1 : frame < 660 ? 2 : 3;
   const captions = [
-    "Every moment becomes a 512-dim vector in turbopuffer.",
-    "Time-filtered queries group by moment_type — that's the live board.",
-    "ANN search finds your solo twin — who's standing exactly where you are.",
+    "not just you.",
+    "turbopuffer is mapping every moment.",
+    "each one = a vector. live-clustered.",
+    "you're never alone standing here.",
   ];
 
   return (
-    <AbsoluteFill style={{ padding: 80 }}>
-      {/* Header */}
+    <AbsoluteFill>
+      {/* Header block */}
       <div
         style={{
-          opacity: headerOpacity,
+          position: "absolute",
+          top: 90,
+          left: 0,
+          right: 0,
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
-          gap: 20,
+          opacity: headerOp,
+          padding: "0 60px",
         }}
       >
         <div
           style={{
-            background: "linear-gradient(180deg,#cffafe,#22d3ee)",
+            background: "linear-gradient(180deg, #cffafe, #22d3ee)",
             color: "#08070d",
-            padding: "6px 18px",
+            padding: "10px 22px",
             fontWeight: 900,
-            letterSpacing: "0.2em",
-            fontSize: 16,
+            letterSpacing: "0.25em",
+            fontSize: 20,
             textTransform: "uppercase",
             transform: "rotate(-1.5deg)",
+            boxShadow: "0 0 40px rgba(34,211,238,0.7)",
           }}
         >
-          under the hood
+          ★ under the hood ★
         </div>
         <div
           style={{
-            fontFamily: "'Instrument Serif', Georgia, serif",
-            fontSize: 64,
-            color: "#fafaf7",
+            marginTop: 20,
+            padding: "12px 36px",
+            background: "rgba(8,7,13,0.85)",
+            border: "3px solid rgba(34,211,238,0.7)",
+            borderRadius: 22,
+            boxShadow: "0 0 50px rgba(34,211,238,0.5)",
+            textAlign: "center",
           }}
         >
-          <span style={{ color: "#22d3ee", fontStyle: "italic" }}>turbopuffer</span>{" "}
-          — a live map of human anticipation.
+          <div
+            style={{
+              fontFamily: "'Instrument Serif', Georgia, serif",
+              fontSize: 50,
+              color: "#fafaf7",
+              lineHeight: 1,
+              textShadow: "0 4px 18px rgba(0,0,0,0.8)",
+            }}
+          >
+            powered by
+          </div>
+          <div
+            style={{
+              fontFamily: "'Instrument Serif', Georgia, serif",
+              fontSize: 110,
+              color: "#22d3ee",
+              fontStyle: "italic",
+              marginTop: 0,
+              textShadow:
+                "0 0 50px rgba(34,211,238,0.9), 0 0 120px rgba(167,139,250,0.5)",
+              letterSpacing: "-0.03em",
+              lineHeight: 1.05,
+            }}
+          >
+            turbopuffer
+          </div>
         </div>
       </div>
 
-      {/* Cluster canvas */}
-      <div style={{ position: "relative", flex: 1, marginTop: 40 }}>
-        {MOMENT_TYPES.map((m, ci) => {
-          const cx = width * m.x - 160;
-          const cy = height * m.y - 200;
-
-          const countIn = interpolate(frame, [60, 240], [0, m.count], {
+      {/* Cluster boxes + dots */}
+      {MOMENT_TYPES.map((m, ci) => {
+        const count = Math.round(
+          interpolate(frame, [60 + ci * 15, 240 + ci * 15], [0, m.target], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
-          });
-          const labelOpacity = interpolate(frame, [40 + ci * 10, 60 + ci * 10], [0, 1], {
-            extrapolateRight: "clamp",
-          });
+          })
+        );
+        const labelOp = interpolate(
+          frame,
+          [40 + ci * 12, 70 + ci * 12],
+          [0, 1],
+          { extrapolateRight: "clamp" }
+        );
 
-          return (
+        return (
+          <div
+            key={m.label}
+            style={{
+              position: "absolute",
+              left: m.cx - 160,
+              top: m.cy - 60,
+              width: 320,
+              opacity: labelOp,
+            }}
+          >
             <div
-              key={m.label}
               style={{
-                position: "absolute",
-                left: cx,
-                top: cy,
-                width: 320,
-                opacity: labelOpacity,
+                padding: "14px 18px",
+                borderRadius: 20,
+                background: "rgba(0,0,0,0.65)",
+                border: `2px solid ${m.color}99`,
+                boxShadow: `0 0 40px -5px ${m.color}`,
+                backdropFilter: "blur(10px)",
               }}
             >
               <div
                 style={{
-                  padding: "16px 20px",
-                  borderRadius: 20,
-                  background: "rgba(0,0,0,0.55)",
-                  border: `1.5px solid ${m.color}66`,
-                  boxShadow: `0 0 40px -10px ${m.color}`,
-                  backdropFilter: "blur(6px)",
+                  fontSize: 14,
+                  letterSpacing: "0.25em",
+                  color: m.color,
+                  textTransform: "uppercase",
+                  fontWeight: 900,
+                  marginBottom: 2,
                 }}
               >
+                ● live
+              </div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
                 <div
                   style={{
-                    fontSize: 13,
-                    letterSpacing: "0.2em",
-                    color: m.color,
-                    textTransform: "uppercase",
-                    fontWeight: 800,
-                    marginBottom: 2,
+                    fontFamily: "'Instrument Serif', Georgia, serif",
+                    fontSize: 68,
+                    color: "#fafaf7",
+                    fontVariantNumeric: "tabular-nums",
+                    lineHeight: 1,
                   }}
                 >
-                  right now
+                  {count}
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "baseline",
-                    gap: 10,
-                  }}
-                >
-                  <div
-                    style={{
-                      fontFamily: "'Instrument Serif', Georgia, serif",
-                      fontSize: 56,
-                      color: "#fafaf7",
-                      fontVariantNumeric: "tabular-nums",
-                    }}
-                  >
-                    {Math.round(countIn)}
-                  </div>
-                  <div style={{ fontSize: 20, color: "rgba(255,255,255,0.7)" }}>
-                    {m.label}
-                  </div>
+                <div style={{ fontSize: 24, color: "rgba(255,255,255,0.82)", fontWeight: 700 }}>
+                  {m.label}
                 </div>
               </div>
             </div>
-          );
-        })}
+          </div>
+        );
+      })}
 
-        {/* Dots */}
-        {DOTS.map((d, i) => {
-          const local = frame - d.delay;
-          if (local < 0) return null;
-          const s = spring({
-            frame: local,
-            fps,
-            config: { damping: 10, mass: 0.4 },
-          });
-          const m = MOMENT_TYPES[d.cluster];
-          const cx = width * m.x;
-          const cy = height * m.y;
-          const pulse = Math.sin((frame + i * 3) / 8) * 0.25 + 1;
-          return (
-            <div
-              key={i}
-              style={{
-                position: "absolute",
-                left: cx + d.rx * s,
-                top: cy + d.ry * s,
-                width: 8 * pulse,
-                height: 8 * pulse,
-                borderRadius: 999,
-                background: m.color,
-                boxShadow: `0 0 12px ${m.color}`,
-                opacity: s * 0.9,
-              }}
-            />
-          );
-        })}
-      </div>
+      {DOTS.map((d, i) => {
+        const local = frame - d.delay;
+        if (local < 0) return null;
+        const s = spring({
+          frame: local,
+          fps,
+          config: { damping: 9, mass: 0.4 },
+        });
+        const m = MOMENT_TYPES[d.cluster];
+        const pulse = Math.sin((frame + i * 3) / 9) * 0.3 + 1;
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: m.cx + d.rx * s,
+              top: m.cy + d.ry * s,
+              width: 10 * pulse,
+              height: 10 * pulse,
+              borderRadius: 999,
+              background: m.color,
+              boxShadow: `0 0 16px ${m.color}`,
+              opacity: s * 0.9,
+            }}
+          />
+        );
+      })}
 
-      {/* Caption at bottom */}
-      <div
-        style={{
-          fontFamily: "'Instrument Serif', Georgia, serif",
-          fontSize: 42,
-          color: "#fafaf7",
-          textAlign: "center",
-          maxWidth: 1400,
-          margin: "0 auto",
-          minHeight: 60,
-        }}
-      >
-        <span style={{ color: "#22d3ee", fontStyle: "italic" }}>
-          {captions[captionIdx]}
-        </span>
-      </div>
+      <CaptionBar
+        text={captions[captionPhase]}
+        accent="#22d3ee"
+        startFrame={
+          captionPhase === 0
+            ? 0
+            : captionPhase === 1
+            ? 180
+            : captionPhase === 2
+            ? 420
+            : 660
+        }
+      />
     </AbsoluteFill>
   );
 };

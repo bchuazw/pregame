@@ -8,14 +8,7 @@ import {
   interpolate,
   spring,
 } from "remotion";
-
-type Energy = {
-  confidence: number;
-  intensity: number;
-  focus: number;
-  courage: number;
-  joy: number;
-};
+import { CaptionBar } from "../components/CaptionBar";
 
 type Props = {
   prompt: string;
@@ -23,16 +16,20 @@ type Props = {
   momentType: string;
   mantra: string;
   tags: string[];
-  energy: Energy;
+  caption: string;
   audioFile: string;
   sfxFile?: string;
-  sfxStartFrame?: number;
   paletteFrom: string;
   paletteTo: string;
 };
 
-const TYPING_DURATION_FRAMES = 60; // 2s
-const REVEAL_FRAME = 75; // when result "drops"
+// 60fps. Demo is 14s (840 frames) — plenty of room for music to sink in.
+//   0–90f     prompt types in (1.5s)
+//   90–150f   HYPE button pulses (1s)
+//   150f      ⚡ DROP — white flash, full-volume music, SFX stinger, stamp slams in
+//   150–840f  music plays, mantra, tags, meters, audio viz all live
+const TYPE_END = 90;
+const REVEAL = 150;
 
 export const DemoScene: React.FC<Props> = ({
   prompt,
@@ -40,304 +37,386 @@ export const DemoScene: React.FC<Props> = ({
   momentType,
   mantra,
   tags,
-  energy,
+  caption,
   audioFile,
   sfxFile,
-  sfxStartFrame = 180,
   paletteFrom,
   paletteTo,
 }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
-  // Typing effect
-  const typingChars = Math.min(
-    prompt.length,
-    Math.floor(interpolate(frame, [0, TYPING_DURATION_FRAMES], [0, prompt.length]))
+  // Prompt typing
+  const typed = prompt.slice(
+    0,
+    Math.floor(
+      interpolate(frame, [0, TYPE_END], [0, prompt.length], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      })
+    )
   );
-  const typedText = prompt.slice(0, typingChars);
-  const caretVisible = Math.floor(frame / 8) % 2 === 0;
+  const caretOn = Math.floor(frame / 16) % 2 === 0;
 
   // Reveal spring
   const reveal = spring({
-    frame: frame - REVEAL_FRAME,
+    frame: frame - REVEAL,
     fps,
-    config: { damping: 14, mass: 0.8 },
+    config: { damping: 12, mass: 0.6 },
   });
-  const revealScale = interpolate(reveal, [0, 1], [0.7, 1]);
-  const revealOpacity = interpolate(reveal, [0, 1], [0, 1]);
 
-  // Stamp rotation wobble
+  // Stamp rotation — overshoot wobble
   const stampRot = interpolate(
-    frame - REVEAL_FRAME,
-    [0, 10, 20, 30],
-    [-14, 4, -3, -2],
+    frame - REVEAL,
+    [0, 10, 20, 40, 80],
+    [-22, 8, -4, -1, -2],
     { extrapolateRight: "clamp" }
   );
 
-  // Audio fade-out in last 30 frames
+  // Stamp SCALE PUNCH — slams from 1.4 → 1 in 12 frames for impact
+  const stampScale = interpolate(
+    frame - REVEAL,
+    [0, 12, 25],
+    [1.4, 0.96, 1],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+
+  // WHITE FLASH at drop frame — 6 frames decay
+  const flashOp = interpolate(
+    frame - REVEAL,
+    [0, 2, 14],
+    [0.85, 0.65, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+
+  // Whole-reveal zoom punch
+  const revealScale = interpolate(
+    frame - REVEAL,
+    [0, 20, 40],
+    [1.08, 1.01, 1],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+
+  const buttonFlash = frame >= TYPE_END && frame < REVEAL;
+  const buttonShake = buttonFlash ? Math.sin((frame - TYPE_END) * 1.4) * 6 : 0;
+
+  // Audio — HARD cut-in at REVEAL, full volume instantly. Fade only at end.
   const audioVolume = interpolate(
     frame,
-    [0, 10, durationInFrames - 40, durationInFrames],
+    [REVEAL - 2, REVEAL, durationInFrames - 60, durationInFrames],
     [0, 1, 1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
   return (
-    <AbsoluteFill style={{ padding: 80 }}>
+    <AbsoluteFill style={{ overflow: "hidden" }}>
       <Audio src={staticFile(audioFile)} volume={audioVolume} />
       {sfxFile && (
-        <Sequence from={sfxStartFrame}>
-          <Audio src={staticFile(sfxFile)} volume={0.75} />
+        <Sequence from={REVEAL - 3}>
+          <Audio src={staticFile(sfxFile)} volume={0.85} />
         </Sequence>
       )}
 
-      {/* Corner tape */}
+      {/* WHITE FLASH on drop — viral beat-drop feel */}
+      {flashOp > 0 && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: `radial-gradient(circle at 50% 45%, #ffffff, ${paletteFrom})`,
+            opacity: flashOp,
+            zIndex: 30,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
+      {/* Live tape chip — always visible */}
       <div
         style={{
           position: "absolute",
-          top: 50,
-          right: 80,
-          background: `linear-gradient(180deg, ${paletteFrom}, ${paletteTo})`,
-          color: "#08070d",
-          padding: "6px 18px",
-          fontWeight: 900,
-          letterSpacing: "0.2em",
-          fontSize: 18,
-          textTransform: "uppercase",
-          transform: `rotate(${-2 + Math.sin(frame / 30) * 1.5}deg)`,
-          boxShadow: `0 12px 30px -8px ${paletteFrom}`,
+          top: 110,
+          left: 0,
+          right: 0,
+          display: "flex",
+          justifyContent: "center",
         }}
       >
-        ★ live · {momentType} ★
+        <div
+          style={{
+            background: `linear-gradient(180deg, ${paletteFrom}, ${paletteTo})`,
+            color: "#08070d",
+            padding: "10px 28px",
+            fontWeight: 900,
+            letterSpacing: "0.22em",
+            fontSize: 24,
+            textTransform: "uppercase",
+            transform: `rotate(${-2 + Math.sin(frame / 24) * 2}deg)`,
+            boxShadow: `0 16px 40px -10px ${paletteFrom}`,
+          }}
+        >
+          ★ live · {momentType} ★
+        </div>
       </div>
 
-      <div style={{ display: "flex", gap: 60, height: "100%", alignItems: "stretch" }}>
-        {/* LEFT: input-style card */}
+      {/* PRE-REVEAL: prompt input card */}
+      <div
+        style={{
+          position: "absolute",
+          top: 260,
+          left: 60,
+          right: 60,
+          opacity: interpolate(frame, [REVEAL - 5, REVEAL + 10], [1, 0], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          }),
+          transform: `translateY(${interpolate(
+            frame,
+            [REVEAL, REVEAL + 20],
+            [0, -80],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+          )}px)`,
+        }}
+      >
         <div
           style={{
-            flex: "0 0 600px",
-            display: "flex",
-            flexDirection: "column",
-            gap: 24,
-            justifyContent: "center",
+            borderRadius: 32,
+            padding: 36,
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02))",
+            border: `3px solid ${paletteFrom}66`,
+            boxShadow: `0 0 60px -10px ${paletteFrom}88`,
           }}
         >
           <div
             style={{
-              borderRadius: 28,
-              padding: 32,
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02))",
-              border: `2px solid ${paletteFrom}55`,
-              boxShadow: `0 0 60px -20px ${paletteFrom}`,
-            }}
-          >
-            <div
-              style={{
-                fontSize: 14,
-                letterSpacing: "0.3em",
-                color: paletteFrom,
-                fontWeight: 800,
-                marginBottom: 16,
-              }}
-            >
-              ▶ TELL US WHAT&apos;S ABOUT TO HAPPEN
-            </div>
-            <div
-              style={{
-                fontFamily: "'Instrument Serif', Georgia, serif",
-                fontSize: 28,
-                lineHeight: 1.35,
-                color: "#fafaf7",
-                minHeight: 200,
-              }}
-            >
-              {typedText}
-              {frame < TYPING_DURATION_FRAMES + 10 && caretVisible && (
-                <span style={{ color: paletteFrom }}>▍</span>
-              )}
-            </div>
-          </div>
-
-          {frame >= REVEAL_FRAME - 5 && (
-            <div
-              style={{
-                padding: "14px 24px",
-                borderRadius: 16,
-                background: `linear-gradient(180deg, ${paletteFrom}, ${paletteTo})`,
-                color: "#08070d",
-                fontSize: 22,
-                fontWeight: 900,
-                textAlign: "center",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                transform: `scale(${0.95 + Math.sin(frame / 10) * 0.02})`,
-                boxShadow: `0 20px 40px -10px ${paletteFrom}`,
-              }}
-            >
-              🔥 HYPE ME UP
-            </div>
-          )}
-        </div>
-
-        {/* RIGHT: reveal card */}
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            gap: 28,
-            opacity: revealOpacity,
-            transform: `scale(${revealScale})`,
-            transformOrigin: "left center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: 16,
+              fontSize: 22,
               letterSpacing: "0.3em",
               color: paletteFrom,
-              fontWeight: 800,
+              fontWeight: 900,
+              marginBottom: 20,
               textTransform: "uppercase",
             }}
           >
-            🔥 the moment
+            ▶ i&apos;m about to
           </div>
+          <div
+            style={{
+              fontFamily: "'Instrument Serif', Georgia, serif",
+              fontSize: 54,
+              lineHeight: 1.15,
+              color: "#fafaf7",
+              minHeight: 340,
+              fontStyle: "italic",
+            }}
+          >
+            {typed}
+            {frame < TYPE_END + 10 && caretOn && (
+              <span style={{ color: paletteFrom }}>▍</span>
+            )}
+          </div>
+        </div>
 
+        {buttonFlash && (
+          <div
+            style={{
+              marginTop: 28,
+              padding: "24px 36px",
+              borderRadius: 22,
+              background: `linear-gradient(180deg, ${paletteFrom}, ${paletteTo})`,
+              color: "#08070d",
+              fontSize: 52,
+              fontWeight: 900,
+              textAlign: "center",
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+              transform: `translateX(${buttonShake}px) scale(${1 + Math.sin((frame - TYPE_END) / 3) * 0.04})`,
+              boxShadow: `0 22px 0 -6px ${paletteTo}cc, 0 40px 80px -15px ${paletteFrom}`,
+            }}
+          >
+            🔥 HYPE ME UP
+          </div>
+        )}
+      </div>
+
+      {/* POST-REVEAL: moment stamp + tags + mantra */}
+      <div
+        style={{
+          position: "absolute",
+          top: 220,
+          left: 0,
+          right: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 28,
+          padding: "0 60px",
+          opacity: reveal,
+          transform: `scale(${revealScale})`,
+        }}
+      >
+        {/* Moment STAMP on dark plate */}
+        <div
+          style={{
+            background: "rgba(8,7,13,0.85)",
+            border: `4px solid ${paletteFrom}`,
+            borderRadius: 28,
+            padding: "22px 44px",
+            transform: `rotate(${stampRot}deg) scale(${stampScale})`,
+            boxShadow: `0 0 80px ${paletteFrom}80, inset 0 0 40px ${paletteFrom}22`,
+            maxWidth: 960,
+          }}
+        >
           <h1
             style={{
               fontFamily: "'Instrument Serif', Georgia, serif",
-              fontSize: 200,
-              lineHeight: 0.88,
+              fontSize: 150,
+              lineHeight: 0.9,
               margin: 0,
               color: "#fef3c7",
-              textShadow: `0 0 50px ${paletteFrom}99, 0 0 100px ${paletteTo}66`,
-              transform: `rotate(${stampRot}deg)`,
-              transformOrigin: "left center",
+              textShadow: `0 0 50px ${paletteFrom}ee, 0 0 100px ${paletteTo}88`,
+              textAlign: "center",
+              letterSpacing: "-0.03em",
             }}
           >
             {momentTag}
           </h1>
+        </div>
 
-          <div style={{ display: "flex", gap: 10 }}>
-            {tags.map((t) => (
+        {/* Tags */}
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center", maxWidth: 960 }}>
+          {tags.map((t, i) => {
+            const tagOp = interpolate(
+              frame - REVEAL,
+              [15 + i * 6, 30 + i * 6],
+              [0, 1],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+            );
+            const tagS = interpolate(
+              frame - REVEAL,
+              [15 + i * 6, 35 + i * 6],
+              [0.6, 1],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+            );
+            return (
               <div
                 key={t}
                 style={{
-                  padding: "8px 16px",
+                  padding: "12px 24px",
                   borderRadius: 999,
-                  background: `${paletteFrom}22`,
-                  border: `1.5px solid ${paletteFrom}66`,
+                  background: "rgba(8,7,13,0.85)",
+                  border: `2.5px solid ${paletteFrom}`,
                   color: "#fef3c7",
-                  fontSize: 20,
-                  fontWeight: 700,
+                  fontSize: 28,
+                  fontWeight: 800,
+                  opacity: tagOp,
+                  transform: `scale(${tagS})`,
+                  boxShadow: `0 0 20px ${paletteFrom}55`,
                 }}
               >
                 {t}
               </div>
-            ))}
-          </div>
+            );
+          })}
+        </div>
 
+        {/* Mantra card */}
+        <div
+          style={{
+            padding: "32px 30px 30px",
+            borderRadius: 26,
+            background: "rgba(8,7,13,0.88)",
+            border: `2.5px solid ${paletteFrom}`,
+            position: "relative",
+            boxShadow: `0 0 50px ${paletteFrom}55`,
+            maxWidth: 920,
+            width: "100%",
+            marginTop: 6,
+            opacity: interpolate(frame - REVEAL, [40, 70], [0, 1], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            }),
+            transform: `translateY(${interpolate(
+              frame - REVEAL,
+              [40, 70],
+              [30, 0],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+            )}px)`,
+          }}
+        >
           <div
             style={{
-              padding: 32,
-              borderRadius: 24,
-              background: `linear-gradient(135deg, ${paletteFrom}22, ${paletteTo}22)`,
-              border: `1.5px solid ${paletteFrom}44`,
-              position: "relative",
-              marginTop: 10,
+              position: "absolute",
+              top: -16,
+              left: 28,
+              background: `linear-gradient(180deg, ${paletteFrom}, ${paletteTo})`,
+              color: "#08070d",
+              padding: "5px 16px",
+              fontWeight: 900,
+              letterSpacing: "0.2em",
+              fontSize: 16,
+              textTransform: "uppercase",
+              transform: "rotate(-2deg)",
             }}
           >
-            <div
-              style={{
-                position: "absolute",
-                top: -14,
-                left: 28,
-                background: `linear-gradient(180deg, ${paletteFrom}, ${paletteTo})`,
-                color: "#08070d",
-                padding: "4px 14px",
-                fontWeight: 900,
-                letterSpacing: "0.2em",
-                fontSize: 13,
-                textTransform: "uppercase",
-                transform: "rotate(-1.5deg)",
-              }}
-            >
-              your mantra
-            </div>
-            <div
-              style={{
-                fontFamily: "'Instrument Serif', Georgia, serif",
-                fontSize: 42,
-                lineHeight: 1.2,
-                color: "#fafaf7",
-                marginTop: 6,
-              }}
-            >
-              &ldquo;{mantra}&rdquo;
-            </div>
+            your mantra
           </div>
-
-          {/* Energy meters */}
-          <div style={{ display: "flex", gap: 16, marginTop: 8 }}>
-            {(
-              ["confidence", "intensity", "focus", "courage", "joy"] as const
-            ).map((key, i) => {
-              const target = energy[key];
-              const growFrame = REVEAL_FRAME + 10 + i * 6;
-              const pct = interpolate(frame, [growFrame, growFrame + 30], [0, target], {
-                extrapolateLeft: "clamp",
-                extrapolateRight: "clamp",
-              });
-              return (
-                <div key={key} style={{ flex: 1 }}>
-                  <div
-                    style={{
-                      fontSize: 11,
-                      letterSpacing: "0.2em",
-                      color: "rgba(255,255,255,0.5)",
-                      textTransform: "uppercase",
-                      marginBottom: 6,
-                      fontWeight: 700,
-                    }}
-                  >
-                    {key}
-                  </div>
-                  <div
-                    style={{
-                      height: 8,
-                      borderRadius: 999,
-                      background: "rgba(255,255,255,0.1)",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: `${pct}%`,
-                        height: "100%",
-                        background: `linear-gradient(90deg, ${paletteFrom}, ${paletteTo})`,
-                        boxShadow: `0 0 10px ${paletteFrom}`,
-                      }}
-                    />
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 22,
-                      fontFamily: "'Instrument Serif', Georgia, serif",
-                      color: "#fafaf7",
-                      marginTop: 4,
-                    }}
-                  >
-                    {Math.round(pct)}
-                  </div>
-                </div>
-              );
-            })}
+          <div
+            style={{
+              fontFamily: "'Instrument Serif', Georgia, serif",
+              fontSize: 44,
+              lineHeight: 1.22,
+              color: "#fafaf7",
+              marginTop: 6,
+              textAlign: "center",
+            }}
+          >
+            &ldquo;{mantra}&rdquo;
           </div>
         </div>
       </div>
+
+      {/* Audio visualizer — reacts to music beat */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 340,
+          left: 60,
+          right: 60,
+          display: "flex",
+          gap: 6,
+          alignItems: "flex-end",
+          height: 120,
+          opacity: interpolate(frame - REVEAL, [30, 60], [0, 0.9], {
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          }),
+          justifyContent: "center",
+        }}
+      >
+        {Array.from({ length: 36 }).map((_, i) => {
+          const beatPhase = (frame + i * 11) / 5;
+          const centerBoost = 1 - Math.abs(i - 18) / 18;
+          const h =
+            14 +
+            Math.abs(Math.sin(beatPhase)) * (70 + centerBoost * 40) +
+            Math.abs(Math.sin(beatPhase / 3)) * 20;
+          return (
+            <div
+              key={i}
+              style={{
+                width: 16,
+                height: h,
+                borderRadius: 4,
+                background: `linear-gradient(180deg, ${paletteFrom}, ${paletteTo})`,
+                boxShadow: `0 0 14px ${paletteFrom}aa`,
+              }}
+            />
+          );
+        })}
+      </div>
+
+      <CaptionBar text={caption} accent={paletteFrom} />
     </AbsoluteFill>
   );
 };

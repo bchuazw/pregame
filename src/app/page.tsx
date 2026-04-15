@@ -91,12 +91,12 @@ export default function Home() {
                 <div className="tape animate-wobble">★ LIVE · RIGHT NOW ★</div>
               </div>
 
-              <div className="inline-flex items-center gap-2 w-fit px-3 py-1.5 rounded-full bg-gradient-to-r from-flame-500/20 to-hype-400/20 border border-flame-400/30 text-xs text-flame-300 font-bold">
+              <div className="inline-flex items-center gap-2 w-fit px-3 py-1.5 rounded-full bg-gradient-to-r from-flame-500/25 to-hype-400/25 border border-flame-400/40 text-xs text-flame-200 font-bold backdrop-blur">
                 <span className="w-1.5 h-1.5 rounded-full bg-flame-400 animate-pulse" />
-                <span className="uppercase tracking-[0.25em]">live hype line</span>
+                <span className="uppercase tracking-[0.25em]">live hype line · open now</span>
               </div>
 
-              <h1 className="font-display text-6xl md:text-8xl leading-[0.9] tracking-tight">
+              <h1 className="font-display text-6xl md:text-8xl leading-[0.88] tracking-tight">
                 The moment
                 <br />
                 right before
@@ -104,13 +104,21 @@ export default function Home() {
                 <span className="gradient-hype italic animate-glitch-x">deserves a soundtrack.</span>
               </h1>
 
-              <p className="text-lg md:text-2xl text-white/70 max-w-3xl leading-relaxed">
-                Tell us what you&apos;re about to do. We&apos;ll score it —
-                <span className="text-hype-200"> original music</span>,
-                <span className="text-flame-400"> punchy SFX</span>, and a
-                <span className="text-cyber-300"> live board</span> of who else
-                is right here with you.
+              <p className="text-lg md:text-2xl text-white/75 max-w-3xl leading-relaxed">
+                Tell us what you&apos;re about to do. We score it —
+                <span className="text-hype-200 font-semibold"> original music</span>,
+                <span className="text-flame-300 font-semibold"> punchy SFX</span>, and a
+                <span className="text-cyber-300 font-semibold"> live board</span> of who else
+                is here with you, right this second.
               </p>
+
+              <div className="flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.22em] text-white/55 font-bold">
+                <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-hype-300" /> ~20s to score</span>
+                <span className="text-white/20">·</span>
+                <span className="flex items-center gap-1.5"><Radio className="w-3.5 h-3.5 text-cyber-300" /> sub-100ms semantic match</span>
+                <span className="text-white/20">·</span>
+                <span className="flex items-center gap-1.5"><Flame className="w-3.5 h-3.5 text-flame-400" /> no signup</span>
+              </div>
             </div>
 
             {/* INPUT */}

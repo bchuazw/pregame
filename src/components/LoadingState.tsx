@@ -21,26 +21,34 @@ export function LoadingState() {
   }, []);
 
   return (
-    <div className="vibe-card rounded-3xl p-10 flex flex-col items-center gap-6 animate-fade-in">
-      <div className="relative w-16 h-16">
-        <div className="absolute inset-0 rounded-full border-2 border-vibe-400/30" />
-        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-vibe-400 animate-spin" />
-        <div className="absolute inset-2 rounded-full bg-vibe-500/20 animate-pulse-slow" />
+    <div className="vibe-card rounded-3xl p-10 md:p-14 flex flex-col items-center gap-7 animate-fade-in relative overflow-hidden">
+      <div className="absolute -top-20 -left-20 w-72 h-72 bg-hype-400/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-20 -right-20 w-72 h-72 bg-flame-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="relative w-20 h-20">
+        <div className="absolute inset-0 badge-ring rounded-full animate-spin opacity-90" />
+        <div className="absolute inset-[3px] rounded-full bg-ink" />
+        <div className="absolute inset-[8px] rounded-full bg-gradient-to-br from-hype-400/40 to-flame-500/30 animate-pulse-slow" />
       </div>
-      <div className="text-center">
-        <div className="font-display text-2xl mb-1 typewriter-caret">
+
+      <div className="text-center relative">
+        <div className="text-[10px] uppercase tracking-[0.35em] text-hype-300 mb-3 font-bold">
+          ★ scoring your moment ★
+        </div>
+        <div className="font-display text-3xl md:text-4xl mb-2 typewriter-caret leading-tight">
           {STAGES[idx]}
         </div>
-        <div className="text-sm text-white/40">
+        <div className="text-sm text-white/55">
           About 20 seconds. You got this.
         </div>
       </div>
-      <div className="flex gap-1.5">
+
+      <div className="flex gap-2">
         {STAGES.map((_, i) => (
           <div
             key={i}
-            className={`w-1.5 h-1.5 rounded-full transition ${
-              i <= idx ? "bg-vibe-400" : "bg-white/10"
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              i <= idx ? "bg-hype-400 w-8" : "bg-white/12 w-3"
             }`}
           />
         ))}

@@ -26,19 +26,27 @@ html, body {
   color: var(--ink);
 }
 
-/* Animated aurora — big, shifting gradient blobs */
+/* Animated aurora — big, shifting gradient blobs (muted so text reads) */
 .aurora {
-  position: absolute;
+  position: fixed;
   inset: -25%;
   background:
-    radial-gradient(45% 38% at 18% 12%, rgba(252, 211, 77, 0.22), transparent 60%),
-    radial-gradient(40% 35% at 82% 22%, rgba(236, 72, 153, 0.22), transparent 60%),
-    radial-gradient(55% 45% at 50% 85%, rgba(34, 211, 238, 0.18), transparent 60%),
-    radial-gradient(40% 30% at 75% 65%, rgba(249, 115, 22, 0.18), transparent 60%);
-  filter: blur(40px);
+    radial-gradient(45% 38% at 18% 12%, rgba(252, 211, 77, 0.18), transparent 60%),
+    radial-gradient(40% 35% at 82% 22%, rgba(236, 72, 153, 0.18), transparent 60%),
+    radial-gradient(55% 45% at 50% 85%, rgba(34, 211, 238, 0.15), transparent 60%),
+    radial-gradient(40% 30% at 75% 65%, rgba(249, 115, 22, 0.15), transparent 60%);
+  filter: blur(60px);
   pointer-events: none;
   z-index: 0;
   animation: drift 22s ease-in-out infinite;
+}
+/* Vignette over aurora to anchor center text */
+.aurora::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, transparent 35%, rgba(8,7,13,0.55) 100%);
+  pointer-events: none;
 }
 
 .grain {
@@ -51,12 +59,16 @@ html, body {
   z-index: 100;
 }
 
-/* Vibe card — glassy */
+/* Vibe card — glassy with stronger plate so text reads against aurora */
 .vibe-card {
-  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-  border: 1px solid rgba(255,255,255,0.10);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background:
+    linear-gradient(180deg, rgba(20,17,30,0.72), rgba(8,7,13,0.85));
+  border: 1px solid rgba(255,255,255,0.12);
+  backdrop-filter: blur(24px) saturate(1.2);
+  -webkit-backdrop-filter: blur(24px) saturate(1.2);
+  box-shadow:
+    0 30px 80px -30px rgba(0,0,0,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.06);
 }
 
 /* NEON text glow */
@@ -218,6 +230,14 @@ html, body {
   50% { opacity: 0; }
 }
 
+.typewriter-caret::after {
+  content: "▍";
+  margin-left: 4px;
+  animation: caret-blink 1s steps(2) infinite;
+  color: var(--hype);
+  opacity: 0.85;
+}
+
 /* Confetti */
 .confetti-burst {
   position: absolute;
@@ -256,6 +276,35 @@ html, body {
 /* Big rotating badge */
 .badge-ring {
   background: conic-gradient(from 0deg, #fcd34d, #ec4899, #22d3ee, #a78bfa, #fcd34d);
+}
+
+/* Energy meter fill — gradient bar */
+.vibe-meter-fill {
+  background: linear-gradient(90deg, #fcd34d, #f97316 50%, #ec4899);
+  box-shadow: 0 0 14px rgba(252, 211, 77, 0.5);
+}
+
+/* Audio play button — chunky primary */
+.btn-primary {
+  background: linear-gradient(180deg, #fcd34d 0%, #f97316 100%);
+  color: var(--ink);
+  font-weight: 800;
+  transition: transform 0.12s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  box-shadow:
+    0 10px 0 -4px rgba(234, 88, 12, 0.55),
+    0 18px 40px -12px rgba(252, 211, 77, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow:
+    0 12px 0 -4px rgba(234, 88, 12, 0.6),
+    0 22px 50px -12px rgba(252, 211, 77, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+.btn-primary:active {
+  transform: translateY(1px);
 }
 
 input, textarea {

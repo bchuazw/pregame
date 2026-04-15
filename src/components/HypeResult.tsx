@@ -40,21 +40,24 @@ export function HypeResult({ result }: { result: HypeResultData }) {
         <div className="flex items-start justify-between gap-4 mb-6 relative">
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-hype-300 font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-flame-400 animate-pulse" />
               <Flame className="w-3.5 h-3.5" />
-              the moment
+              your moment
             </div>
-            <h2 className="stamp animate-stamp neon-hype font-display text-5xl md:text-8xl leading-[0.9] tracking-tight">
-              {p.moment_tag}
-            </h2>
+            <div className="inline-block px-5 py-2.5 rounded-2xl bg-black/60 border-2 border-hype-400/60 shadow-[0_0_50px_rgba(252,211,77,0.35)] w-fit">
+              <h2 className="stamp animate-stamp neon-hype font-display text-5xl md:text-8xl leading-[0.9] tracking-tight">
+                {p.moment_tag}
+              </h2>
+            </div>
             {p.one_liner && (
-              <p className="text-white/60 text-base md:text-lg italic max-w-prose">
-                {p.one_liner}
+              <p className="text-white/75 text-base md:text-lg italic max-w-prose mt-1">
+                &ldquo;{p.one_liner}&rdquo;
               </p>
             )}
           </div>
           <button
             onClick={handleShare}
-            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm transition shrink-0"
+            className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/8 hover:bg-hype-400/20 border border-white/15 hover:border-hype-400/50 text-sm transition shrink-0 font-semibold"
           >
             <Share2 className="w-4 h-4" />
             <span className="hidden sm:inline">Share</span>
@@ -69,13 +72,10 @@ export function HypeResult({ result }: { result: HypeResultData }) {
           ))}
         </div>
 
-        <div className="mb-8 p-5 md:p-6 rounded-2xl bg-gradient-to-br from-hype-400/15 to-flame-500/15 border border-hype-400/30 relative">
+        <div className="mb-8 p-6 md:p-7 rounded-2xl bg-black/55 border border-hype-400/40 relative shadow-[0_0_40px_rgba(252,211,77,0.15)]">
           <div className="absolute -top-3 left-6 tape">your mantra</div>
-          <div className="text-xs uppercase tracking-widest text-hype-300 mb-2 opacity-0">
-            your mantra
-          </div>
-          <div className="font-display text-2xl md:text-3xl leading-snug">
-            "{p.mantra}"
+          <div className="font-display text-2xl md:text-3xl leading-snug text-hype-50">
+            &ldquo;{p.mantra}&rdquo;
           </div>
         </div>
 
