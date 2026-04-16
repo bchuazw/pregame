@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 
 const STAGES = [
-  "Reading the moment...",
-  "Matching your frequency...",
-  "Finding who else is here right now...",
-  "Composing your hype...",
-  "Loading the crowd...",
-  "Almost game time...",
+  "Reading your day...",
+  "Finding the temperature...",
+  "Searching your archive for echoes...",
+  "Composing the score...",
+  "Layering sound effects...",
+  "Printing the card...",
 ];
 
 export function LoadingState() {
@@ -33,13 +33,13 @@ export function LoadingState() {
 
       <div className="text-center relative">
         <div className="text-[10px] uppercase tracking-[0.35em] text-hype-300 mb-3 font-bold">
-          ★ scoring your moment ★
+          ★ scoring your day ★
         </div>
         <div className="font-display text-3xl md:text-4xl mb-2 typewriter-caret leading-tight">
           {STAGES[idx]}
         </div>
         <div className="text-sm text-white/55">
-          About 20 seconds. You got this.
+          About 20 seconds. Stay.
         </div>
       </div>
 

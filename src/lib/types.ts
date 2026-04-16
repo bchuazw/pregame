@@ -1,43 +1,38 @@
-export interface MomentProfile {
-  moment_type: string;
-  moment_tag: string;
-  mantra: string;
-  one_liner: string;
-  tags: string[];
+export interface DayProfile {
+  headline: string;          // 1-3 WORD uppercase title, e.g. "QUIET WIN", "CHAOS DAY"
+  summary: string;           // one evocative sentence about the day
+  mood_tags: string[];       // 3-4 short mood descriptors
+  key_phrases: string[];     // 2-3 lines pulled from user's text to anchor the card
   energy: {
-    confidence: number;
-    intensity: number;
-    focus: number;
-    courage: number;
-    joy: number;
+    calm: number;
+    spark: number;
+    depth: number;
+    lightness: number;
   };
   music_prompt: string;
-  sfx_prompts: string[];
+  sfx_prompts: string[];     // exactly 2 short stingers
+  palette: {
+    from: string;
+    to: string;
+  };
   content_preview: string;
 }
 
-export interface HypeBoardItem {
-  moment_type: string;
-  count: number;
-}
-
-export interface SoloTwin {
+export interface Callback {
   id: string;
+  headline: string;
   content_preview: string;
-  moment_tag: string;
-  moment_type: string;
   similarity: number;
-  minutes_ago: number;
+  days_ago: number;
+  created_at_iso: string;
 }
 
-export interface HypeResult {
+export interface SoundPost {
   id: string;
-  profile: MomentProfile;
+  profile: DayProfile;
   music_audio_base64: string;
   sfx_audio_base64: string[];
-  solo_twin: SoloTwin | null;
-  hype_board: HypeBoardItem[];
-  live_count: number;
-  league_size: number;
+  callbacks: Callback[];
+  total_archived: number;
   created_at: string;
 }

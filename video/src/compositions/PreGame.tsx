@@ -1,84 +1,106 @@
-import { AbsoluteFill, Audio, Sequence, staticFile } from "remotion";
-import { HookScene } from "../scenes/HookScene";
-import { SetupScene } from "../scenes/SetupScene";
+import { AbsoluteFill, Audio, Sequence, interpolate, staticFile } from "remotion";
+import { OpenerScene } from "../scenes/OpenerScene";
+import { BrandScene } from "../scenes/BrandScene";
 import { DemoScene } from "../scenes/DemoScene";
-import { PufferScene } from "../scenes/PufferScene";
+import { CallbackScene } from "../scenes/CallbackScene";
 import { CloseScene } from "../scenes/CloseScene";
 import { Background } from "../scenes/Background";
+
 const FPS = 60;
 const s = (n: number) => Math.round(n * FPS);
 
-// 58s total:
-//   0-2.5    HOOK           (2.5s)
-//   2.5-5    SETUP          (2.5s)
-//   5-19     DEMO Interview (14s — music breathes)
-//   19-33    DEMO First Date (14s)
-//   33-47    Puffer         (14s)
-//   47-58    Close          (11s)
+// SoundPost reel — 50s total:
+//   0–15    OPENER      Seedance cinematic walk + text overlays
+//   15–18   BRAND       SoundPost logo slam
+//   18–34   DEMO        type day → card reveal → audio plays (16s, music breathes)
+//   34–42   CALLBACKS   turbopuffer "days that felt like this"
+//   42–50   CLOSE       Seedance intimate phone-at-night + URL CTA
 //
-// Continuous background bed at low volume so it never goes silent.
-// During demo windows, bed ducks to ~0.04 so the demo music takes the spotlight.
+// Continuous bed so we never go silent. Ducks under demo music and opener.
 
-const DEMO_1 = { start: s(5), end: s(19) };
-const DEMO_2 = { start: s(19), end: s(33) };
+const END = s(50);
 
-const bedVolume = (frame: number) => {
-  const inDemo1 = frame >= DEMO_1.start && frame < DEMO_1.end;
-  const inDemo2 = frame >= DEMO_2.start && frame < DEMO_2.end;
-  if (inDemo1 || inDemo2) return 0.05;
-  return 0.32;
-};
+// Ambient bed — subtle, constant, fades at very end. No per-scene ducking
+// anymore; scene dynamics come from the melody volume, not the bed.
+const bedVolume = (frame: number) =>
+  interpolate(frame, [0, END - 30, END], [0.13, 0.13, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
+// Continuous melody (first-date.mp3) — one track across the whole video.
+// Volume arc creates the dynamics without ever switching tracks:
+//   0s   quiet intro (0.22)
+//  13s   building into brand (0.32)
+//  15s   brand slam — hits (0.42)
+//  17s   brand held at full energy (0.42) — don't duck during the slam itself
+//  18s   ducks for typing (0.22)
+//  21.5s reveal surge — peak (0.78)
+//  34s   callback, sustained (0.55)
+//  42s   close, sustained (0.48)
+//  49s   gentle fade to 0
+const REVEAL_OVERALL = s(18) + 210; // DemoScene REVEAL frame in overall timeline
+const melodyVolume = (frame: number) =>
+  interpolate(
+    frame,
+    [
+      0,
+      s(13),
+      s(15),
+      s(17),
+      s(18),
+      REVEAL_OVERALL - 20,
+      REVEAL_OVERALL,
+      s(34),
+      s(42),
+      s(49),
+      END,
+    ],
+    [0.22, 0.32, 0.42, 0.42, 0.22, 0.15, 0.78, 0.55, 0.48, 0.4, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
 
 export const PreGame: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: "#08070d", fontFamily: "system-ui" }}>
+      {/* Background only during non-video scenes — video scenes cover it anyway */}
       <Background />
 
-      {/* Continuous bed under everything */}
+      {/* Ambient bed — subtle, continuous */}
       <Audio src={staticFile("audio/bed.mp3")} volume={bedVolume} loop />
 
-      <Sequence from={0} durationInFrames={s(2.5)}>
-        <HookScene />
+      {/* Single continuous melody across all 50s — volume arc drives dynamics, no track-switching */}
+      <Audio src={staticFile("audio/first-date.mp3")} volume={melodyVolume} loop />
+
+      <Sequence from={0} durationInFrames={s(15)}>
+        <OpenerScene />
       </Sequence>
 
-      <Sequence from={s(2.5)} durationInFrames={s(2.5)}>
-        <SetupScene />
+      <Sequence from={s(15)} durationInFrames={s(3)}>
+        <BrandScene />
       </Sequence>
 
-      <Sequence from={s(5)} durationInFrames={s(14)}>
+      <Sequence from={s(18)} durationInFrames={s(16)}>
         <DemoScene
-          prompt="walking into an interview for the job I've wanted for 3 years"
-          momentTag="THE INTERVIEW"
-          momentType="job interview"
-          mantra="You are ready. Everything you are brings you to this moment."
-          tags={["panic", "stakes", "steady"]}
-          caption="hands shaking. brain won't stop."
-          audioFile="audio/interview.mp3"
-          sfxFile="audio/interview-sfx.mp3"
-          paletteFrom="#fcd34d"
-          paletteTo="#f97316"
+          dayText="finished the thing i'd been avoiding. ate lunch outside. the afternoon exhaled."
+          headline="QUIET WIN"
+          keyPhrases={[
+            "finished the thing",
+            "ate lunch outside",
+            "the afternoon exhaled",
+          ]}
+          moodTags={["quiet relief", "warm", "earned"]}
+          summary="A day that didn't announce itself. The kind you don't post about, but remember."
+          paletteFrom="#6ee7b7"
+          paletteTo="#06b6d4"
         />
       </Sequence>
 
-      <Sequence from={s(19)} durationInFrames={s(14)}>
-        <DemoScene
-          prompt="first date in 20 min with someone out of my league"
-          momentTag="FIRST DATE"
-          momentType="first date"
-          mantra="Let them meet the real you — that's the only version worth showing up for."
-          tags={["butterflies", "open", "playful"]}
-          caption="sitting in my car. can't get out."
-          audioFile="audio/first-date.mp3"
-          paletteFrom="#22d3ee"
-          paletteTo="#a78bfa"
-        />
+      <Sequence from={s(34)} durationInFrames={s(8)}>
+        <CallbackScene />
       </Sequence>
 
-      <Sequence from={s(33)} durationInFrames={s(14)}>
-        <PufferScene />
-      </Sequence>
-
-      <Sequence from={s(47)} durationInFrames={s(11)}>
+      <Sequence from={s(42)} durationInFrames={s(8)}>
         <CloseScene />
       </Sequence>
     </AbsoluteFill>

@@ -2,20 +2,20 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Hypeman — your personal hypeman for the leap",
+  title: "SoundPost — your life, with a score",
   description:
-    "Tell Hypeman what you're about to do. He brings the music, the punch, and the proof you're not alone — exactly when you need to go do it.",
+    "Tell SoundPost what today was. It writes a custom score, layers SFX, and prints a shareable card. Every post makes the next one sharper.",
   openGraph: {
-    title: "Hypeman",
+    title: "SoundPost",
     description:
-      "Your personal hypeman for the leap right in front of you. AI-scored. Live.",
+      "Some days don't need words. Just a soundtrack. AI-scored journaling, live.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Hypeman",
+    title: "SoundPost",
     description:
-      "Your personal hypeman for the leap right in front of you.",
+      "Some days don't need words. Just a soundtrack.",
   },
 };
 

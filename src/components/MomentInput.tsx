@@ -1,15 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import { Flame, Zap } from "lucide-react";
+import { Sparkles, Loader2 } from "lucide-react";
 
 const EXAMPLES: { label: string; emoji: string; tone: "hype" | "pink" | "cyber" | "violet"; text: string }[] = [
-  { label: "Job interview", emoji: "💼", tone: "hype", text: "I'm about to walk into an interview for the job I've wanted for three years. My hands won't stop shaking." },
-  { label: "Quitting", emoji: "🚪", tone: "pink", text: "I'm about to tell my boss I'm quitting. I've rehearsed it for weeks. I've never done this before." },
-  { label: "First date", emoji: "🌹", tone: "pink", text: "First date in 20 minutes with someone who's way out of my league. I don't know what to say." },
-  { label: "Hard conversation", emoji: "💬", tone: "violet", text: "I'm about to tell my best friend something that might end our friendship. I'm outside their door." },
-  { label: "Big race", emoji: "🏃", tone: "cyber", text: "Half marathon starts in 30 minutes. I trained for 6 months. I've never done anything this hard." },
-  { label: "Asking them out", emoji: "💌", tone: "hype", text: "I'm finally texting them back to ask if they want to get dinner. I've typed and deleted this message 40 times." },
+  {
+    label: "Quiet win",
+    emoji: "🌿",
+    tone: "cyber",
+    text: "Nothing huge happened today. Finished the thing I'd been avoiding for two weeks. Ate lunch outside. The afternoon felt like it exhaled.",
+  },
+  {
+    label: "Chaos day",
+    emoji: "🌀",
+    tone: "pink",
+    text: "Missed the bus, spilled coffee on my laptop, got blindsided by a Slack message at 4pm. Ended the day laughing in the kitchen at how much went wrong.",
+  },
+  {
+    label: "Heavy hour",
+    emoji: "🌧️",
+    tone: "violet",
+    text: "Had the call I'd been putting off. Said what I needed to say. Walked home slowly. The city felt far away but in a good way.",
+  },
+  {
+    label: "Bright Tuesday",
+    emoji: "☀️",
+    tone: "hype",
+    text: "First real warm day of the year. Cycled everywhere. Bumped into an old friend at the coffee shop. Stayed up late on the roof just because I could.",
+  },
+  {
+    label: "Slow sunday",
+    emoji: "📖",
+    tone: "cyber",
+    text: "Didn't leave the apartment. Read half a novel. Made pasta from scratch. The kind of day you don't post about but remember.",
+  },
+  {
+    label: "Nearly",
+    emoji: "🎯",
+    tone: "violet",
+    text: "Pitched the idea. They almost said yes. Walked out knowing I was closer than I've ever been and further than I wanted to be.",
+  },
 ];
 
 export function MomentInput({
@@ -34,15 +64,15 @@ export function MomentInput({
         <div className="relative vibe-card rounded-3xl p-5 md:p-6">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-[10px] uppercase tracking-[0.3em] text-hype-300 font-bold">
-              ▶ tell us what&apos;s about to happen
+              ▶ how was today
             </span>
             <span className="caret-blink text-xs" />
           </div>
           <textarea
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            placeholder="I'm about to..."
-            rows={3}
+            placeholder="a few sentences. a moment. whatever the day actually felt like."
+            rows={4}
             disabled={loading}
             className="w-full bg-transparent text-white placeholder:text-white/25 text-xl md:text-2xl font-display resize-none outline-none disabled:opacity-60 leading-snug"
             onKeyDown={(e) => {
@@ -65,13 +95,13 @@ export function MomentInput({
             >
               {loading ? (
                 <>
-                  <Zap className="w-5 h-5 animate-pulse" />
-                  <span>Loading the hype...</span>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Scoring your day…</span>
                 </>
               ) : (
                 <>
-                  <Flame className="w-5 h-5" />
-                  <span>Hype me up</span>
+                  <Sparkles className="w-5 h-5" />
+                  <span>Score my day</span>
                 </>
               )}
             </button>

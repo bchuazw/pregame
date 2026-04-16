@@ -77,7 +77,7 @@ export function AudioStack({
     if (!musicSrc) return;
     const a = document.createElement("a");
     a.href = musicSrc;
-    a.download = "vibecheck-music.mp3";
+    a.download = "soundpost.mp3";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -108,7 +108,7 @@ export function AudioStack({
 
         <div className="flex-1 flex flex-col gap-1.5">
           <div className="text-xs uppercase tracking-widest text-white/50">
-            your vibe, scored
+            your day, scored
           </div>
           <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
             <div

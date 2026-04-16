@@ -1,21 +1,21 @@
 import { Turbopuffer } from "@turbopuffer/turbopuffer";
-import type { MomentProfile, HypeBoardItem, SoloTwin } from "./types";
+import type { DayProfile, Callback } from "./types";
 
 const client = new Turbopuffer({
   apiKey: process.env.TURBOPUFFER_API_KEY!,
   region: process.env.TURBOPUFFER_REGION || "gcp-us-central1",
 });
 
-const NAMESPACE = process.env.TURBOPUFFER_NAMESPACE || "pregame-hype-v1";
+const NAMESPACE = process.env.TURBOPUFFER_NAMESPACE || "soundpost-v1";
 
 export function ns() {
   return client.namespace(NAMESPACE);
 }
 
-export async function upsertMoment(
+export async function upsertPost(
   id: string,
   vector: number[],
-  profile: MomentProfile
+  profile: DayProfile
 ): Promise<void> {
   const nowMs = Date.now();
   await ns().write({
@@ -24,11 +24,13 @@ export async function upsertMoment(
       {
         id,
         vector,
-        moment_type: profile.moment_type,
-        moment_tag: profile.moment_tag,
+        headline: profile.headline,
+        summary: profile.summary,
         content_preview: profile.content_preview,
-        tags: profile.tags,
+        mood_tags: profile.mood_tags,
         music_prompt: profile.music_prompt,
+        palette_from: profile.palette.from,
+        palette_to: profile.palette.to,
         created_at_ms: nowMs,
         created_at_iso: new Date(nowMs).toISOString(),
       },
@@ -36,83 +38,58 @@ export async function upsertMoment(
   });
 }
 
-export async function findSoloTwin(
+export async function findCallbacks(
   vector: number[],
-  excludeId: string
-): Promise<SoloTwin | null> {
+  excludeId: string,
+  k = 3
+): Promise<Callback[]> {
   try {
     const res = await ns().query({
       rank_by: ["vector", "ANN", vector],
-      top_k: 10,
+      top_k: k + 2,
       include_attributes: [
-        "moment_tag",
-        "moment_type",
+        "headline",
         "content_preview",
         "created_at_ms",
+        "created_at_iso",
       ],
     });
     const rows = (res.rows ?? []) as Array<Record<string, unknown>>;
-    const others = rows.filter((r) => String(r.id) !== excludeId);
-    if (others.length === 0) return null;
-
-    const best = others[0];
-    const distance = Number(best.$dist ?? best.dist ?? 0);
-    const similarity = Math.max(0, Math.min(1, 1 - distance));
-    const createdAt = Number(best.created_at_ms ?? 0);
-    const minutes_ago = createdAt > 0 ? Math.max(0, Math.round((Date.now() - createdAt) / 60000)) : 0;
-
-    return {
-      id: String(best.id),
-      content_preview: String(best.content_preview ?? ""),
-      moment_tag: String(best.moment_tag ?? ""),
-      moment_type: String(best.moment_type ?? ""),
-      similarity,
-      minutes_ago,
-    };
+    const now = Date.now();
+    return rows
+      .filter((r) => String(r.id) !== excludeId)
+      .slice(0, k)
+      .map((r) => {
+        const distance = Number(r.$dist ?? r.dist ?? 0);
+        const similarity = Math.max(0, Math.min(1, 1 - distance));
+        const createdAt = Number(r.created_at_ms ?? 0);
+        const days_ago =
+          createdAt > 0 ? Math.max(0, Math.round((now - createdAt) / (24 * 60 * 60 * 1000))) : 0;
+        return {
+          id: String(r.id),
+          headline: String(r.headline ?? ""),
+          content_preview: String(r.content_preview ?? ""),
+          similarity,
+          days_ago,
+          created_at_iso: String(r.created_at_iso ?? ""),
+        };
+      });
   } catch (err) {
-    console.error("turbopuffer solo-twin query failed", err);
-    return null;
+    console.error("turbopuffer callbacks query failed", err);
+    return [];
   }
 }
 
-export async function getLiveHypeBoard(
-  windowMs: number = 60 * 60 * 1000
-): Promise<{ board: HypeBoardItem[]; live_count: number }> {
-  const since = Date.now() - windowMs;
-  try {
-    const res = await ns().query({
-      top_k: 250,
-      filters: ["created_at_ms", "Gt", since],
-      include_attributes: ["moment_type", "created_at_ms"],
-    });
-    const rows = (res.rows ?? []) as Array<Record<string, unknown>>;
-    const counts = new Map<string, number>();
-    for (const r of rows) {
-      const t = String(r.moment_type ?? "other");
-      counts.set(t, (counts.get(t) ?? 0) + 1);
-    }
-    const board: HypeBoardItem[] = Array.from(counts.entries())
-      .map(([moment_type, count]) => ({ moment_type, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 6);
-    return { board, live_count: rows.length };
-  } catch (err) {
-    console.error("turbopuffer hype-board query failed", err);
-    return { board: [], live_count: 0 };
-  }
-}
-
-export async function countLeague(momentType: string): Promise<number> {
+export async function countArchive(): Promise<number> {
   try {
     const res = await ns().query({
       top_k: 1000,
-      filters: ["moment_type", "Eq", momentType],
-      include_attributes: ["moment_type"],
+      include_attributes: ["created_at_ms"],
     });
     const rows = (res.rows ?? []) as Array<Record<string, unknown>>;
     return rows.length;
   } catch (err) {
-    console.error("turbopuffer league-count failed", err);
+    console.error("turbopuffer count failed", err);
     return 0;
   }
 }
